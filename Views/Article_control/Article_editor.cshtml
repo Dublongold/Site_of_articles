@@ -1,0 +1,89 @@
+﻿@using Dublongold_site.Models
+@model Article?
+
+@{
+    ViewData["Title"] = "Create article";
+    if(ViewData["css_files"] is List<string> css_files)
+    {
+        string[] css_files_path = {"Article/article_editor.css"};
+        css_files.AddRange(css_files_path);
+    }
+    string? article_title_image, article_theme, article_tags, article_description, article_content, article_authors;
+    article_title_image = article_theme = article_tags = article_description = article_content = article_authors = null;
+    if(ViewData["js_files"] is List<string> js_files)
+    {
+        string[] src_paths = { "Article/article_editor_scripts/add_new_image_in_article_editor_script.js",
+                                "Article/article_editor_scripts/editor_actions_buttons_script.js",
+                                "Article/article_editor_scripts/article_editor_image_prameters_container.js",
+                                "Article/article_editor_scripts/image_delete_and_apply_changes_script.js",
+                                "Article/article_editor_scripts/article_editor_clear_font_in_context.js",
+                                "Article/article_editor_functions_script.js",
+                                "Article/article_editor_scripts/add_title_image_script.js"};
+        js_files.AddRange(src_paths);
+    }
+    string tags_title = "Призначені для спрощення пошуку статті, якщо при пошуку вони враховуються; вводьте, розділяючи їх комами; використовуйте лише літери, числа та символи \"_\" та \",\"(для розділення тегів); всі пробіли будуть автоматично замінятися комами; максимальна кількість символів - 100; теги вводити не обов'язково.";
+    if(Model is not null)
+    {
+        article_title_image = Model.Title_image;
+        article_theme = $"{Model.Theme}";
+        article_tags = $"{Model.Tags}";
+        article_description = $"{Model.Description}";
+        article_content = Model.Content;
+        if(Model.Authors.Count > 1)
+        {
+            article_authors = $"{Model.Authors.Skip(1).Select(u => u.Login).Aggregate((u1, u2) => u1 + "," + u2)}";
+        }
+    }
+}
+<form id="article_editor_elements" method="post" action="/article/editor_of" enctype="multipart/form-data" article_id = "@(Model is not null?Model.Id:"New")">
+    <labeL class="preview-image">Титульне зображення:</labeL>
+    <br />
+    <img src="@(article_title_image is not null? article_title_image:"/Default_article_photo.png")" class="article-title-image" title="Титульне зображення, яке буде відображатися першому погляді на вашу статтю."/>
+    <br />
+    <input  type="file" id = "article_title_image_input" title="Тут ви можете завантажити ваше титульне зображення." accept="image/*"/>
+    <input type="hidden" name="Title_image" id = "article_title_image_input_src"/>
+    <br />
+    <label for="article_theme" title="Тема вашої статті. Максимальна кількість символів - 50.">Тема:</label>
+    <br />
+    <input class="article-editor-input" name = "Theme" id = "article_theme" maxlength="50" value="@article_theme"/>
+    <br />
+    <label for="article_tags" title="@tags_title">Теги:</label>
+    <br />
+    <input class="article-editor-input" name = "Tags" id = "article_tags" maxlength="100" value="@article_tags"/>
+    <br />
+    <label for="article_description" title="Опис вашої статті при першому погляді на неї. Максимальна кількість символів - 100; Вводити опис вашої статті не обов'язково, але тоді за замовчуванням використовуються перші 50 символів вашої статті (замість зображень - просто слово зображення).">Опис:</label>
+    <br />
+    <input class="article-editor-input" name = "Description" id = "article_description" maxlength="100" value="@article_description"/>
+    <br />
+    <label for="article_content" title = "Зміст (контент) вашої статті.">Контент:</label>
+    <br />
+    <div class="article-editor-content" id = "article_content" contenteditable="true">@(article_content is not null?Html.Raw(article_content):"")</div>
+    <input name = "Content" type="hidden" id = "hidden_article_content">
+    <button type="button" class="clear-fonts-in-article-content" title="Кнопка, яка очищює шрифти, які були додані через копіювання даних з іншого місця. Натиснувши на кнопку, ви зможете легко видалити їх всі і продовжити працювати зі своєю статтей. Якщо ви вставили зображення зі зміненими параметрами, то потрібно просто змінити значення одного з параметрів та повернути його назад.">Очистити шрифти</button>
+    <div id="images_of_article">
+        <fieldset id = "images_field">
+            <legend class = "image-fieldset-legend" title="Тут ви можете завантажувати та вставляти зображення в вашу статтю. Для цього оберіть потрібне зображення, перетягніть в статтю та встановіть налаштування, які вам більше всього підходять. Але є одне зауваження: не можна завантажувати декілька однакових картинок.">Зображення</legend>
+            <fieldset class = "image-fieldset">
+                <legend class = "image-fieldset-legend">Завантажте нове зображення тут</legend>
+                <input name="image_file_for_article" type="file" accept="image/*"/>
+            </fieldset>
+        </fieldset>
+    </div>
+    <label for="article_authors" title="Додаткові автори, які допомагали працювати над статтею; вводьте їх, розділяючи комами; тільки логіни; якщо ви є єдиним автором, то можете залишити це поле пустим.">Додаткові автори:</label>
+    <br />
+    <input class="article-editor-input" name = "Co_authors" id = "article_authors" maxlength="100" value="@article_authors"/>
+    <br />
+    <pre class="article-editor-warning">Увага!
+Впевніться, що тема та вміст не пусті. Інакше при спробі створити або зберегти статтю, дані, які ви вводити, зникнути!
+Також не оновлюйте сторінку перед створенням або редагуванням сторінки тому, що в такому випадку ви втратите дані, які вводили.
+Для додаткової інформації, наведіть курсор миші на текст, який над полем для вводу даних, почекайте декілька секунд і прочитайте правила заповнення цього елементу вашої статті.</pre>
+    @if(ViewData["edit-article"] is bool edit_article && edit_article == true)
+    {
+        <button class="article-edit-button" id="article_edit_button" type="button" title="Кнопка для підтвердження створення вашої статті. Уважно перевірте все, що ви вводили, перед клацанням на кнопку.">Редагувати</button>
+    }
+    else
+    {
+        <button class="article-create-button" id="article_create_button" type="button" title="Кнопка для підтвердження створення вашої статті. Уважно перевірте все, що ви вводили, перед клацанням на кнопку.">Створити</button>
+    }
+    <button class="review-article-button" id="article_preview_button" type="button" title="Кнопка для попереднього перегляду вашої статті. Уважно перевірте все, що ви вводили, перед клацанням на кнопку.">Попередній перегляд</button>
+</form>

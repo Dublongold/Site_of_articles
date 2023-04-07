@@ -1,0 +1,40 @@
+﻿@using Dublongold_site.Models
+@{
+    string[] checkbox_names = { "Theme", "Tags", "Description", "Content", "Authors", "Id" };
+    string[] checkbox_names_on_ukraine = { "Тема", "Теги", "Опис", "Вміст", "Автори", "Айді" };
+    bool[] search_options = { true, true, true, true, true, true };
+    bool[]? search_options_from_view_data = ViewContext.HttpContext.Session.GetString("search_options")?.Split(";").Select(s => s.Equals("True") || s.Equals("true")).ToArray();
+    string[]? search_histroy = ViewContext.HttpContext.Session.GetString("search_history")?.Split(";");
+    if (search_options_from_view_data is not null && search_options_from_view_data.Length == checkbox_names.Length)
+    {
+        search_options = search_options_from_view_data;
+    }
+}
+
+<form method="get" action="/find" id="find_form">
+    <div class = "find-main-text-and-input-container">
+        <label class = "find-main-text" for="name_or_text_of_article">Напишить текст та натисніть кнопку "Пошук", щоб знайти потрібну вам статтю.</label>
+        <input name="name_or_text_of_article" class ="find-input" id = "find_input" value="@ViewData["Find_text"]"/>
+    </div>
+    <div class = "find-criterias-and-button-container">
+        <label class = "find-options-text">Шукати за наступними критеріями:</label>
+        <div class = "find-options-container">
+        @for (int i = 0; i < checkbox_names.Length; i++)
+        {
+            <label for="find_@checkbox_names[i].ToLower()">@checkbox_names_on_ukraine[i]:</label>
+            @* Елемент, який буде визначати, шукати по цьому критерію чи ні. id - щоб простіше було знайти в скриптах, name - щоб краще сприймав сервер, class - щоб накласти стилі *@
+            <input type="checkbox" id = "find_@checkbox_names[i].ToLower()" name = "find_@checkbox_names[i].ToLower()" class = "find-option" checked="@search_options[i]">
+        }
+        </div>
+        <button type="button" id = "find_button">Пошук</button>
+    </div>
+</form>
+@if(search_histroy is not null && search_histroy.Length > 0)
+{
+<ul>
+    @foreach(string search_history_element in search_histroy)
+    {
+    <li></li>        
+    }
+</ul>
+}

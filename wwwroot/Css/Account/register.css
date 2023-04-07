@@ -1,0 +1,33 @@
+#register_form{
+    position: relative;
+    width:max-content;
+    
+}
+#register_form > div{
+    display:grid;
+    grid-template-columns: max-content max-content auto;
+    column-gap: 5px;
+}
+
+#register_form > div > label{
+    font-size: large;
+}
+#submit_register_user_container{
+    padding-top: 5px;
+    grid-column: span 2;
+}
+#submit_register_user{
+    width:max-content;
+    float: right;
+}
+.register-error-message{
+    color: rgb(255, 23, 23);
+    white-space: break-spaces;
+    font-size: large;
+}
+
+#register_user_data_container{
+    grid-row: span 6;
+    display: grid;
+    grid-template-columns: max-content max-content;
+}

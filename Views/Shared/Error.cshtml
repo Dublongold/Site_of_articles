@@ -1,0 +1,23 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Помилка @ViewContext.HttpContext.Response.StatusCode</title>
+        <meta charset="utf-8"/>
+        <link href="/Css/main_style.css" rel="stylesheet"/>
+        <link href="/Css/error_page.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <div class="error-body">
+            <span id="error_message_title_text">Виникла помилка:</span>
+            <p id = "error_message_error_code">Код помилки: @ViewContext.HttpContext.Response.StatusCode</p>
+            <div id ="error_message_go_to_home">
+                <a id = "error_message_anchor" href="/home">Перейдіть за цим посиланням-текстом або клацніть на кнопку нижче, щоб перейти на головну сторінку:</a>
+                <button id="back_to_home" type="button">Повернутись на головну сторінку</button>
+            </div>
+        </div>
+        <script src="/JavaScript/error_page.js"></script>
+    </body>
+</html>

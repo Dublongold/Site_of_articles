@@ -1,0 +1,41 @@
+.find-input{
+    display:block;
+    width:100%;
+    margin-bottom: 2px;
+    box-sizing:border-box;
+}
+.find-error-message{
+    display: block;
+    color:rgb(255, 0, 0);
+}
+
+.find-option{
+    border: 1px solid white;
+    border-radius: 5px;
+}
+.find-options-container{
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-template-rows: auto auto auto;
+    column-gap: 5px;
+}
+
+#find_form{
+    border: 3px solid rgb(83, 84, 98);
+    border-radius: 5px;
+}
+#find_path{
+    background-color: rgba(32,33,35);
+    vertical-align: top;
+    padding:0px 5px 5px 5px;
+}
+.find-main-text{
+    display:block;
+}
+.find-main-text-and-input-container{
+    border-bottom: 3px solid rgb(83, 84, 98);
+    padding: 3px;
+}
+.find-criterias-and-button-container{
+    padding: 3px;
+}

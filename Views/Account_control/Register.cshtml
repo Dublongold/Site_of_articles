@@ -1,0 +1,47 @@
+﻿@using Dublongold_site.Models
+@model string?
+@{
+    ViewData["Title"] = "Регістрація";
+
+    if(ViewData["css_files"] is List<string> css_files)
+    {
+        css_files.Add("Account/register.css");
+    }
+    if(ViewData["js_files"] is List<string> js_files)
+    {
+        js_files.Add("Account/register.js");
+    }
+}
+<form  id = "register_form" action = "/account/register" method="post">
+    <div>
+        @* Ім'я користувача *@
+        <label for="register_user_name">Ім'я:</label>
+        <input id="register_user_name" name="user-name-for-register"/>
+        <div id="register_user_name_error" class="register-error-message"></div>
+        @* Прізвище користувача *@
+        <label for="register_user_surname">Прізвище:</label>
+        <input id="register_user_surname" name="user-surname-for-register"/>
+        <div id="register_user_surname_error" class="register-error-message"></div>
+        @* Логін користувача *@
+        <label for="register_user_login">Логін:</label>
+        <input id="register_user_login" name="user-login-for-register"/>
+        <div id="register_user_login_error" class="register-error-message"></div>
+        @* Пароль користувача *@
+        <label for="register_user_password">Пароль:</label>
+        <input type="password" id="register_user_password" name="user-password-for-register"/>
+        <div id="register_user_password_error" class="register-error-message"></div>
+        @* Підтвердження паролю користувача *@
+        <label for="register_user_confirm_password">Підтвердження паролю:</label>
+        <input type="password" id="register_user_confirm_password"/>
+        <div id="register_user_confirm_password_error" class="register-error-message"></div>
+        @* Пошта користувача *@
+        <label for="register_user_email">Пошта:</label>
+        <input id="register_user_email" name="user-email-for-register"/>
+        <div id="register_user_email_error" class="register-error-message"></div>
+        @* Кнопка створення користувача *@
+        <div id="submit_register_user_container">
+            <button type = "button" id="submit_register_user">Створити</button>
+        </div>
+        <div id="register_user_error" class="register-error-message">@Model</div>
+    </div>
+</form>

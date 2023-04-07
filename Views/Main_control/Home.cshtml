@@ -1,0 +1,8 @@
+﻿@using Dublongold_site.Models
+@model List<Article>?
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h3 id="body_head_text">Найбільш популярні статті:</h3>
+@await Html.PartialAsync("Render_articles", Model)

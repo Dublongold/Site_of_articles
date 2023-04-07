@@ -1,0 +1,48 @@
+﻿@using Dublongold_site.Models
+@using Microsoft.EntityFrameworkCore
+@{
+    User_account? user_account = null;
+    using(Database_context db_context = new())
+    {
+        if (User.Identity is not null)
+        {
+            user_account = await db_context.User_accounts.FirstOrDefaultAsync(u => u.Login == User.Identity.Name);
+            if(user_account is not null)
+            {
+                await db_context.Entry(user_account).Collection(u => u.Articles).LoadAsync();
+                await db_context.Entry(user_account).Collection(u => u.Comments).LoadAsync();
+                await db_context.Entry(user_account).Collection(u => u.Articles_which_been_read).LoadAsync();
+            }
+            
+        }
+    }
+}
+@if(user_account is null)
+{
+    <button id="login_button">Увійти</button> <button id="register_button">Зареєструватися</button>
+}
+else
+{
+<div class="login-path-container">
+    <div class="user-main-data-container">
+        <a href="/account/profile/@user_account.Login"><img src = "@user_account.Get_photo" id="login_path_user_photo"/></a>
+        Ласкаво просимо, @user_account.Name @user_account.Surname (<a href="/account/profile/@user_account.Login">@@@user_account.Login</a>)
+        <br>
+        <button id="logout_button">
+            Вийти
+        </button>
+    </div>
+    <div class="user-other-data-container">
+        Ранг: @user_account.Get_user_rank_as_string();
+        <div class="user-article-read-and-comments-container">
+            <div class="user-some-info">Статей: @user_account.Articles.Count,</div>
+            <div class="user-some-info">Прочитали: <span id = "articles_which_user_have_read">@user_account.Articles_which_been_read.Count</span>;</div>
+            <div class="user-some-info">Коментарів: @user_account.Comments.Count</div>
+        </div>
+    </div>
+</div>
+<div class = "user_article_buttons">
+    <button type="button" id = "follow_to_article_create_button">Написати нову статтю</button>
+    <button type="button" id = "follow_to_user_articles_button">Ваші статті</button>
+</div>
+}

@@ -1,0 +1,84 @@
+.comment-container{
+    border-collapse: collapse;
+    margin-top: 10px;
+    vertical-align: top;
+    width: fit-content;
+    display:grid;
+    grid-template-columns:60vh min-content;
+}
+.comment-data-container{
+    padding:5px;
+    position:relative;
+}
+.comment-author-photo-container{
+    display: inline-block;
+}
+.comment-author-login-and-full-name-container{
+    display:inline-block;
+}
+.comment-date{
+    position: absolute;
+    top:5px;
+    right:5px;
+}
+.comment-content-container{
+    margin-bottom:10px;
+    overflow-wrap: break-word;
+}
+.comment-reaction-container{
+    padding:5px;
+}
+.comment-author-login-container{
+    display: block;
+    margin: 0px 0px 5px 0px;
+}
+.replies-button-of-comment{
+    float:right;
+}
+.comment-actions-buttons-container{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    flex-direction: column;
+    justify-content: space-between;
+    width:fit-content;
+}
+.edit-button-of-comment, .delete-button-of-comment, .write-reply-button-of-comment{
+    width:100%;
+}
+.write-reply-name-text{
+    display:block;
+}
+.write-reply-content, #write_content_of_comment{
+    display: block;
+    min-height: 50px;
+    max-height: 50vh;
+    width:60vh;
+    resize: vertical;
+    border: 1px solid black;
+    padding: 5px;
+}
+.write-reply-content::selection, #write_content_of_comment:focus-visible{
+    outline:1px solid rgb(100, 100, 111);
+
+}
+.cancel-write-reply{
+    margin-left:1%;
+}
+.textarea-for-edit-content-of-comment{
+    position: relative;
+    left:-3px;
+    width: 100%;
+    min-height: 50px;
+    max-height: 50vh;
+    resize:vertical;
+    background-color: #ffffff50;
+}
+.button-for-save-changes-of-comment-content{
+    display: block;
+    float: right;
+}
+#submit_write_comment{
+    display:block;
+    margin-top: 3px;
+}

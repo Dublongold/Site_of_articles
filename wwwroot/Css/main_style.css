@@ -1,0 +1,28 @@
+body{
+    background-color: rgba(32,33,35);
+    color:rgb(233 233 237);
+    font-family: 'Times New Roman', Times, serif;
+    font-size:medium;
+    margin:0%;
+}
+button{
+    color: white;
+    background-color: rgba(52,53,65);
+}
+button:hover{
+    border: 2px solid black;
+}
+a{
+    color:rgb(0 147 251);;
+}
+input, textarea{
+    background-color: rgb(57, 57, 57);
+    color:rgb(255, 255, 255);
+}
+input[type="text"]:hover, textarea:hover{
+    border: 2px solid white;
+    border-radius: 2px;
+}
+input::placeholder, textarea::placeholder{
+    color:rgb(187, 187, 187);
+}

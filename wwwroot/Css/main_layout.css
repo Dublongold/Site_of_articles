@@ -1,0 +1,52 @@
+.dublongold-home-button{
+    position: relative;
+    font-size: 2.3em;
+    width: 200px;
+    height: 50px;
+    text-align: center;
+    line-height: 0%;
+}
+.dublongold-home-button > span{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#title_elements_path_container{
+    background-color: rgb(37 37 46);
+}
+#footer_body{
+    text-align: center;
+    vertical-align: bottom;
+}
+
+.container_of_body_and_find{
+    padding: 0px;
+    vertical-align: top;
+    display: grid;
+    grid-template-columns: 85% 15%;
+}
+#page_body{
+    background-color: rgba(52,53,65);
+    padding:5px;
+    overflow: hidden;
+    min-height: 80vh;
+}
+#footer_body{
+    padding:1%;
+}
+
+.error-message{
+    display: block;
+    color: red;
+    padding:2px;
+}
+#image_with_anchor_to_home{
+    margin-right: 7px;
+}
+
+#body_head_text{
+    width:fit-content;
+    padding-bottom: 5px;
+    border-bottom: 2px solid white;
+}

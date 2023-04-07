@@ -1,0 +1,108 @@
+﻿@using Dublongold_site.Models
+@using Dublongold_site.Useful_classes
+@using Microsoft.EntityFrameworkCore
+@addTagHelper *,Dublongold_site
+@model Article?
+@{
+    ViewData["Title"] = Model?.Theme ?? "Стаття";
+    (ViewData["css_files"] as List<string>)?.Add("Article/read_article.css");
+    string you_have_read_too = "";
+    string[] background_reaction_color = { "rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)" };
+    if(User.Identity is not null && User.Identity.IsAuthenticated && Model is not null)
+    {
+        if(Model.Users_who_have_read.Any(u => u.Login == User.Identity.Name))
+        {
+            you_have_read_too = " (ви вже прочитали також)";
+        }
+    }
+    @if(ViewData["css_files"] is List<string> css_files)
+    {
+        string[] css_files_paths = {"Comment/comment.css"};
+        css_files.AddRange(css_files_paths);
+    }
+}
+<div id = "article_body" article_id="@(Model?.Id ?? -1)">
+    @if (Model is not null)
+    {
+        <article>
+            <p style="font:24px normal black; text-align:center">@Model.Theme</p>
+            <hr />
+            <p>Теги: @(string.IsNullOrEmpty(Model.Tags)?"Немає...":Model.Tags)</p>
+            <div class="article-content-container">@Html.Raw(Model.Content)</div>
+            <span id = "user_who_have_read_count" have_read = "@(you_have_read_too != ""?"true":"false")">Прочитало: @Model.Users_who_have_read.Count@you_have_read_too</span>
+            <br />
+            <div class="like-dislike-author-container">
+                <div>
+                    <button type = "button" id = "like_article" 
+                        style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">Подобається</button>
+                    : <span id = "like_count_of_article" >@Model.Users_who_liked.Count</span>
+                    <span> | </span>
+                    <button type = "button" id = "dislike_article"
+                        style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">Не подобається</button>
+                    : <span id = "dislike_count_of_article">@Model.Users_who_disliked.Count</span>
+                </div>
+                <div class="author-element">
+                    @if(Model.Authors.Count > 1)
+                    {
+                        <text>Автори:</text>
+                    }
+                    else
+                    {
+                        <text>Автор:</text>
+                    }
+                    @if(Model.Authors.Count > 0)
+                    {
+                        <text>@Html.Raw(Model.Authors.Select(x => $"<a href=\"/account/profile/{x.Login}\">@{x.Login}</a>").Aggregate((u1, u2) => u1 + ", " + u2))</text>
+                    }
+                    else
+                    {
+                        <text>Ніхто..?</text>
+                    }
+                </div>
+            </div>
+        </article>
+        <hr/>
+        @if (TempData["without_comments"] is null)
+        {
+            @if (User.Identity is not null && User.Identity.IsAuthenticated)
+            {
+                <div id="write_comment_field">           
+                    <span>Ваше поле для написання коментаря:</span>
+                    <br />
+                    <textarea id="write_content_of_comment" placeholder="Напишіть тут текст вашого коментаря..." maxlength="2000"></textarea>
+                    <button id="submit_write_comment" type="button">Відправити</button>
+                </div>
+            }
+            else
+            {
+                <div id="unauthorized_cannot_write_comments_text">Тільки авторизовані користувачі можуть залишати коментарі...</div>
+            }
+            <hr />
+            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", Model.Comments.OrderByDescending(c => c.Created_date).ThenBy(c => c.Id).ToList())
+
+            if (ViewData["js_files"] is List<string> js_files)
+            {
+                string[] src_paths = { "Article/article_reactions_scripts/article_reaction_buttons_scrtipt.js",
+                                        "Article/article_read_controller.js",
+                                        "Comment/comment_like_and_dislike_scripts/like_comment_script.js",
+                                        "Comment/comment_like_and_dislike_scripts/dislike_comment_script.js",
+                                        "Comment/comment_like_and_dislike_scripts/change_comment_color_script.js",
+                                        "Comment/write_comment.js", "Comment/comment_edit.js", "Comment/comment_delete.js",
+                                        "Comment/replies_controller.js", "Comment/write_reply_button.js",
+                                        "Comment/add_event_listeners_for_comments_buttons.js",
+                                        "Comment/get_comment_or_article_id.js",
+                                        "Comment/load_more_comments.js"
+                                    };
+                js_files.AddRange(src_paths);
+            }
+        }
+        else
+        {
+            <p><em>Коли ви створете статтю, то тоді тут будуть коментарі...</em></p>
+        }
+    }
+    else
+    {
+        <em>Вибачте, але чомусь ця стаття пуста...</em>
+    }
+</div>

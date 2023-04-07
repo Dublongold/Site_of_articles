@@ -1,0 +1,37 @@
+﻿@using Dublongold_site.Models
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@model User_account
+@{
+    ViewData["Title"] = "Login";
+}
+
+<form method="post" action="/account/login">
+    <table>
+        <tr>
+            <td>
+                <label asp-for="Login"></label><span>:</span>
+            </td>
+            <td>
+                <input asp-for="Login"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Password"></label><span>:</span>
+            </td>
+            <td>
+                <input type="password" asp-for="Password"/>
+            </td>
+        </tr>
+    </table>
+    <input type="submit"/>
+    <input type="hidden" name ="referrer_url" value="@ViewData["Referrer"]"/>
+</form>
+@if (ViewData["login_error"]?.ToString() == "invalid_login")
+{
+    <p>Sorry, but not found user with login "@Model?.Login.</p>
+}
+else if (ViewData["login_error"]?.ToString() == "invalid_password")
+{
+    <p>Sorry, but this password does not match.</p>
+}

@@ -1,0 +1,18 @@
+#back_to_home{
+    display: block;
+    margin-top: 3px;
+}
+body{
+    margin:1%;
+}
+.error-body{
+    background-color: rgb(62, 63, 75);;
+    width:max-content;
+    border: 1px solid rgba(0,0,0,0);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#error_message_title_text{
+    border-bottom: 2px solid white;
+}

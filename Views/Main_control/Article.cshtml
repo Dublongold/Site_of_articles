@@ -1,0 +1,9 @@
+﻿@using Dublongold_site.Models
+@addTagHelper *, Dublongold_site
+@model Article?
+
+@{
+    ViewData["Title"] = Model?.Theme;
+}
+
+<render_article article="@Model"></render_article>

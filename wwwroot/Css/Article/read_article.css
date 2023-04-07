@@ -1,0 +1,25 @@
+#article_body{
+    margin-left: 2%;
+    margin-right: 2%;
+    text-align: justify;
+}
+
+.like-dislike-author-container{
+    display:grid;
+    width:90%;
+    grid-template-columns: auto auto ;
+    grid-template-rows: auto;
+    column-gap: 5px;
+    row-gap:1px;
+}
+div.author-element{
+    text-align:right;
+}
+.article-content-container{
+    overflow-wrap: break-word;
+    margin-bottom: 10px;
+}
+.comment-author-photo{
+    max-width:50px;
+    max-height:50px;
+}

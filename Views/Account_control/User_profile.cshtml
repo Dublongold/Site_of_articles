@@ -1,0 +1,100 @@
+﻿@using Dublongold_site.Models
+
+@model User_account
+
+@{
+    ViewData["Title"] = Model.Login;
+    string[] background_reaction_color = { "#ff8e8e", "#8eff8e", "unset" };
+    if(ViewData["css_files"] is List<string> css_files)
+    {
+        css_files.Add("Account/user_profile.css");
+    }
+    if(ViewData["js_files"] is List<string> js_files)
+    {
+        string[] js_file_paths ={
+                    "Account/account_reaction_controller_script.js",
+                    "Account/edit_user_account_info.js"
+        };
+        js_files.AddRange(js_file_paths);
+    }
+}
+
+<div id = "user_profile_container">
+    <div class="user-profile-info">
+        @* Зберігає зображення профілю користувача *@
+        <div class = "user-profile-photo-container">
+            @* Зображення профілю користувача *@
+            <img id = "user_profile_photo" src="@Model.Get_photo"/>
+        </div>
+        @* Зберагіє текстову інформацію користувача *@
+        <div class = "user-profile-text-info">
+            <div class = "user-profile-login-and-full-name">
+            @* Ім'я та прізвище (друге ім'я) користувача *@
+            <p style="margin-top:5px;">Користувач:</p>
+            <div id = "user_full_name"><span id="user_name">@Model.Name</span> <span id="user_surname">@Model.Surname</span></div>@* Кнопка, яка дозволить редагувати ім'я та прізвище (друге ім'я). Вона вставлена так, щоб не було проблем з зайвим пробільним символом. *@@if (User.Identity is not null && User.Identity.Name == Model.Login){<button type="button" id="edit_user_account_full_name">Редагувати</button>}
+            @* Логін *@
+            <p id="user_login"><a href="/account/profile/@Model.Login">@@@Model.Login</a></p>
+            </div>
+            @* Дата створення *@
+            <p id="user_created_date">Створений: @Model.Created</p>
+            @* Про користувача *@
+            <p id = "user_about">Про себе: <span id="user_about_text">@(Model.About != ""?Model.About:"Не вказано.")</span>@* Кнопка, яка дозволить редагувати інформацію про себе *@@if (User.Identity is not null && User.Identity.Name == Model.Login){<button type="button" id="edit_user_account_about">Редагувати</button>}</p>
+            <div id = "reactions_to_user_account">
+                @* Кнопка "Подобається" або, якщо користувач, який переглядає цю сторінку, і є цим користувачем, то простий текст "Подобається" *@
+                @if((User.Identity is null || User.Identity.Name is null) || User.Identity is not null && User.Identity.Name == Model.Login)
+                {
+                    <text>Подобається : </text>
+                }
+                else
+                {
+                <button type = "button" id = "account_like_button"
+                style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">
+                    Подобається
+                </button><text> : </text>
+                }
+                <span id="number_of_account_likes">@Model.Users_who_liked.Count</span>
+                <span> | </span>
+                @* Кнопка "Не подобається" або, якщо користувач, який переглядає цю сторінку, і є цим користувачем, то простий текст "Не подобається" *@
+                @if((User.Identity is null || User.Identity.Name is null) || User.Identity is not null && User.Identity.Name == Model.Login)
+                {
+                    <text>Не подобається : </text>
+                }
+                else
+                {
+                <button type = "button" id = "account_dislike_button"
+                style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">
+                    Не подобається
+                </button><text> : </text>
+                }
+                <span id="number_of_account_dislikes">@Model.Users_who_disliked.Count</span>
+            </div>
+        </div>
+        <div id="change_user_photo_container">
+            <fieldset>
+                <legend>Змініти фото свого профілю</legend>
+                <input type="file" accept="image/*" id="change_user_photo_input"/>
+             </fieldset>
+        </div>
+    </div>
+    @* Якщо користувач писав статті, то вони виведуться, якщо ні, то буде це вказано *@
+    @if(Model.Articles.Count > 0)
+    {
+        @* Якщо більше, чем 5 статтей, то виводимо лише 5 найбільш популярних, інакше виводимо всі *@
+        <fieldset> 
+        @if(Model.Articles.Count > 5)
+        {
+            <legend class = "title-of-user-articles">5 найбільш популярних статтей, написаних цим користувачем:</legend>
+            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_liked.Count - art.Users_who_disliked.Count).ThenBy(art => art.Theme).ThenBy(art => art.Description).Take(5).ToList())
+        }
+        else if (Model.Articles.Count > 0)
+        {
+            <legend class = "title-of-user-articles">Статті, написані цим користувачем:</legend>
+            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_liked.Count - art.Users_who_disliked.Count).ThenBy(art => art.Theme).ThenBy(art => art.Description).ToList())
+        }
+        </fieldset>
+    }
+    else
+    {
+        <p>Нажаль, цей користувач ще не писав статті.</p>
+    }
+</div>

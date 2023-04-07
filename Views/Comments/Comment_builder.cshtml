@@ -1,0 +1,143 @@
+﻿@using Dublongold_site.Models
+@model Article_comment
+@{
+    Layout = null;
+    string[] background_comment_color = { "#ff000040", "#00ff0040", "#0000ff40" };
+    string[] background_reaction_color = { "rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)" };
+    string[] comment_color = { "red", "green", "blue" };
+    Article_comment? Main_comment = ViewData["Main_comment"] as Article_comment;
+    User_account? user_account = null;
+    int count_of_liked = Model.Users_who_liked.Count;
+    int count_of_disliked = Model.Users_who_disliked.Count;
+    int color_number_for_comment = count_of_liked < count_of_disliked ? 0 : count_of_disliked != count_of_liked ? 1 : 2;
+    string? reply_to_id = null;
+    Article? article = null;
+
+    using (Database_context db_context = new())
+    {
+        if (User.Identity is not null && User.Identity.IsAuthenticated)
+        {
+            user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity.Name);
+        }
+        article = db_context.Articles.FirstOrDefault(art => art.Id == Model.Article_id);
+        if (article is not null)
+        {
+            await db_context.Entry(article).Collection(art => art.Authors).LoadAsync();
+        }
+    }
+    if (Model.Reply_to_comment is not null)
+    {
+        reply_to_id = $"reply_to_id = {Model.Reply_to_comment_id} reply_level = {Model.Reply_level}";
+    }
+
+}
+
+@if (Model is not null)
+{
+    @*
+        Все, що представляє коментар. Тобто, контент, автор, час створення, кнопки взаємодії тощо.
+        comment_id призначений для вказування id цього коментаря для видалення, редагування, відповідей на нього тощо
+    *@
+    <div class="comment-container" style="margin-left:@Model.Reply_level%; border-left: 1px solid @comment_color[color_number_for_comment]; 
+    border-right: 1px solid @comment_color[color_number_for_comment]; background-color: @background_comment_color[color_number_for_comment];"
+    comment_id = "@Model.Id" @reply_to_id>
+        <div>
+            @*Data div*@
+            <div class="comment-data-container">
+                @* Фотографія користувача *@
+                <div class = "comment-author-photo-container">
+                    <a href = "/account/profile/@Model.Author.Login">
+                        <img class = "comment-author-photo" src = "@Model.Author.Get_photo"/>
+                    </a>
+                </div>
+                <div class = "comment-author-login-and-full-name-container">
+                    @*Ім'я та логін користувача. Якщо це той користувач, який зараз авторизований, то додається "(Ви)", або якщо він автор, то додається "(Автор)"*@
+                    <span class="comment-author-name-surname-container">
+                        @Model.Author.Name @Model.Author.Surname
+                        @(Model.Author_id == user_account?.Id ?
+                                                                 "(Ви)"
+                                                                 //else if
+                                                                 : article?.Authors.Any(u => u.Id == Model.Author_id) ?? false ?
+                                                                     "(Автор)"
+                                                                     //else
+                                                                     : "")
+                    </span>
+                    @*Елемент, який зберігає логін користувача*@
+                    <span class="comment-author-login-container">@*Робимо його надрядковим*@<sup>(<a href="account/profile/@Model.Author.Login">@@@Model.Author.Login)</a></sup></span>
+                </div>
+                @*Дата та час створення коментаря*@
+                <span class="comment-date">
+                    @Model.Created_date.ToShortDateString()
+                    <br />
+                    @Model.Created_date.ToShortTimeString()
+                </span>
+                @*Контент коментаря*@
+                <div class="comment-content-container">@Html.Raw(Model.Content)</div>
+            </div>
+            @*Like, dislike, reply(s) div*@
+            <div class="comment-reaction-container">
+                @*Кнопка Подобається*@
+                <button type = "button" class = "like-button-of-comment"
+                style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">
+                    Подобається
+                </button> : 
+                <span class="number-of-comment-likes">@Model.Users_who_liked.Count</span>
+                <span> | </span>
+                @*Кнопка Не подобається*@
+                <button type = "button" class = "dislike-button-of-comment"
+                style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">
+                    Не подобається
+                </button> : 
+                <span class="number-of-comment-dislikes">@Model.Users_who_disliked.Count</span>
+                @*Якщо є відповіді, то створити класс, який буде зберігати відповіді на цей коментар*@
+                @if (Model.Replying_comments.Count > 0)
+                {
+                    @*Кнопка Показати відповідь/відповіді(кількість_відповідей)*@
+                    <button type = "button" class = "replies-button-of-comment" replies_are_hidened="true">
+                        <span class = "replies-button-of-comment-status-text">Показати</span>
+                        <span> </span>
+                        <span class = "count-replies-of-comment">
+                            @if (Model.Replying_comments.Count == 1)
+                            {
+                                <text>відповідь</text>
+                            }
+                            else
+                            {
+                                <text>відповіді (@Model.Replying_comments.Count.ToString())</text>
+                            }
+                        </span>
+                    </button>
+                }
+            </div>
+        </div>
+        @*Зберігає такі кнопки як редагувати, видалити та відповісти.*@
+        <div class = "comment-actions-buttons-container" style="border-left:1px solid @comment_color[color_number_for_comment]">
+            @*Delete/Edit div*@
+            <div>
+                @if ((User.Identity is not null && User.Identity.IsAuthenticated && User.Identity.Name == Model.Author.Login) || (article?.Authors.Any(u => u.Id == user_account?.Id) ?? false))
+                {
+                    <div>
+                        @if (User.Identity is not null && User.Identity.IsAuthenticated && User.Identity.Name == Model.Author.Login)
+                        {
+                            <button class = "edit-button-of-comment" type = "button">Редагувати</button>
+                        }
+                        <button class = "delete-button-of-comment" type = "button">Видалити</button>
+                    </div>
+                }
+            </div>
+            @*Reply div*@
+            <div>
+                @if (User.Identity is not null && User.Identity.IsAuthenticated)
+                {
+                <div >
+                    <button class = "write-reply-button-of-comment" type = "button">Відповісти</button>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p style="margin-left:@(Model?.Reply_level ?? 0)%;">Коментарів не знайдено...</p>
+}

@@ -1,0 +1,51 @@
+﻿@using Dublongold_site.Useful_classes
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Dublongold | @ViewData["Title"]</title>
+        <meta charset="utf-8" />
+        <meta name="open-at" content="@DateTime.Now"/>
+        @if(ViewData["css_files"] is List<string> css_files)
+        {
+            @foreach(string css_file in css_files)
+            {
+                <link href="/Css/@css_file" rel="stylesheet"/>
+            }
+        }
+    </head>
+    <body>
+        <div id = "title_elements_path_container">
+            <div id="image_with_anchor_to_home" style="display:inline-block;">
+                <button class = "dublongold-home-button"><span>Dublongold</span></button>
+            </div>
+            <div name="div_for_login_path" id="div_for_login_path">
+                @await Html.PartialAsync("Login_path")
+            </div>
+        </div>
+        <div class = "container_of_body_and_find">
+            <div id = "page_body">
+                    @RenderBody()
+            </div>
+            <div id = "find_path">
+                @await Html.PartialAsync("Find_path")
+            </div>
+        </div>
+        <footer id = "footer_body">
+            @if(IsSectionDefined("Footer"))
+            {
+            @RenderSection("Footer")
+            }
+            else
+            {
+            <p class="Footer">Авторські права належать Dublongold. 2023. Всі права захищені.</p>
+            }
+        </footer>
+        @if(ViewData["js_files"] is List<string> js_files)
+        {
+            @foreach(string js_file in js_files)
+            {
+            <script src="/JavaScript/@js_file"></script>
+            }
+        }
+    </body>
+</html>

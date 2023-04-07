@@ -1,0 +1,9 @@
+﻿@using Dublongold_site.Models
+@model List<Article>?
+@{
+    ViewData["Title"] = "Your articles";
+    ViewData["user_articles"] = true;
+}
+
+<h3 id="body_head_text">Ваші статті:</h3>
+@await Html.PartialAsync("Render_articles", Model)

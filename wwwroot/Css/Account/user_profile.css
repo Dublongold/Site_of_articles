@@ -1,0 +1,94 @@
+#user_profile_photo{
+    max-width: 150px;
+    max-height: 150px;
+    min-width: 50px;
+    min-height: 50px;
+    border: 3px solid rgb(71, 72, 85);
+    border-radius: 5px;
+
+}
+
+/*#change_user_photo_container{
+    border-
+}*/
+.user-profile-info{
+    padding:5px 12px 5px 12px;
+    display:grid;
+    margin: 0px 2px 0px 2px;
+    grid-template-columns: max-content 70%;
+    gap:7px;
+    width: 100%;
+    border:3px solid gray;
+    border-radius: 5px;
+    box-sizing:border-box;
+}
+.user-profile-text-info{
+    border: 1px solid gray;
+    display:grid;
+    grid-column: auto;
+}
+.user-profile-text-info > *{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.user-profile-login-and-full-name{
+    border-bottom: 1px solid gray;
+}
+.user-profile-photo-container{
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center
+}
+#user_full_name, #user_about{
+    display:inline-block;
+}
+
+#user_name, #user_surname{
+    font-size:large;
+}
+#user_created_date{
+    font-style: italic;
+    margin-top:5px;
+    margin-bottom:5px;
+    padding-bottom:5px;
+    border-bottom: 1px solid gray;
+}
+
+#user_login, #user_about{
+    margin-top: 0px;
+    margin-bottom: 7px;
+    width: fit-content;
+    max-width:100%;
+}
+
+#edit_user_account_full_name{
+    margin-left: 2%;
+}
+
+#edit_user_account_about{
+    float: right;
+    margin-top: 5px;
+}
+
+#save_edit_user_full_name_button, #save_edit_user_account_about{
+    margin-left: 5px;
+}
+#edit_user_about{
+    display:block;
+    max-width:75vh;
+    max-height:10vh;
+}
+#user_about_text{
+    display: block;
+    overflow-wrap: anywhere;
+}
+#change_user_photo_input{
+    display:block;
+}
+#reactions_to_user_account{
+    border-top: 1px solid gray;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
