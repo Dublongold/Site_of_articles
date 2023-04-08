@@ -4,7 +4,7 @@
     <head>
         <title>Dublongold | @ViewData["Title"]</title>
         <meta charset="utf-8" />
-        <meta name="open-at" content="@DateTime.Now"/>
+        <open-at>@DateTime.Now</open-at>
         @if(ViewData["css_files"] is List<string> css_files)
         {
             @foreach(string css_file in css_files)

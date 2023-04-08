@@ -6,7 +6,7 @@ async function load_more_comments(event: PointerEvent)
         let last_comment_id = this_element.getAttribute("last_comment_id");
         if(last_comment_id !== null)
         {
-            console.log("Спроба довантажити сторінки.");
+            console.log("Спроба довантажити сторінки.\n" + last_comment_id);
         }
     }
 }
