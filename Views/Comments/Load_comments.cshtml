@@ -1,0 +1,34 @@
+﻿@using Dublongold_site.Models
+@model List<Article_comment>
+@{
+    Layout = null;
+    Article_comment? Main_comment = ViewData["Main_comment"] as Article_comment;
+    User_account? user_account = null;
+    using(Database_context db_context = new())
+    {
+        if (User.Identity is not null)
+        {
+            user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity.Name);
+        }
+    }
+}
+
+@if (Model.Count > 0)
+{
+    @foreach (Article_comment comment in Model.Take(10).ToList())
+    {
+        if (Main_comment != comment.Reply_to_comment)
+        {
+            continue;
+        }
+        await Html.RenderPartialAsync("/Views/Comments/Comment_builder.cshtml",comment);
+    }
+    @if(ViewData["last-comment-id"] is int last_comment_id_var)
+    {
+        <button id="load_more_comments" last_comment_id = "@last_comment_id_var">Завантажити ще...</button>
+    }
+}
+else
+{
+    <p id="comments_not_found"><em>Додаткових коментарів немає...</em></p>
+}

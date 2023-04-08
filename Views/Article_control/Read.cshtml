@@ -20,6 +20,14 @@
         string[] css_files_paths = {"Comment/comment.css"};
         css_files.AddRange(css_files_paths);
     }
+
+    List<Article_comment>? comments = null;
+    if(Model is not null)
+    {
+        comments = Sort_sequence_by.Sort_comment_by(Model.Comments, ViewData["sort-by"]?.ToString()).Take(11).ToList();
+        if (comments.Count > 10)
+            ViewData["last-comment-id"] = comments.Last().Id;
+    }
 }
 <div id = "article_body" article_id="@(Model?.Id ?? -1)">
     @if (Model is not null)
@@ -78,15 +86,14 @@
                 <div id="unauthorized_cannot_write_comments_text">Тільки авторизовані користувачі можуть залишати коментарі...</div>
             }
             <hr />
-            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", Model.Comments.OrderByDescending(c => c.Created).ThenBy(c => c.Id).ToList())
+            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", comments?.Take(10).ToList() ?? new List<Article_comment>(0))
 
             if (ViewData["js_files"] is List<string> js_files)
             {
                 string[] src_paths = { "Article/article_reactions_scripts/article_reaction_buttons_scrtipt.js",
                                         "Article/article_read_controller.js",
-                                        "Comment/comment_like_and_dislike_scripts/like_comment_script.js",
-                                        "Comment/comment_like_and_dislike_scripts/dislike_comment_script.js",
-                                        "Comment/comment_like_and_dislike_scripts/change_comment_color_script.js",
+                                        "Comment/comment_reaction_scripts/comment_reaction.js",
+                                        "Comment/comment_reaction_scripts/change_comment_color_script.js",
                                         "Comment/write_comment.js", "Comment/comment_edit.js", "Comment/comment_delete.js",
                                         "Comment/replies_controller.js", "Comment/write_reply_button.js",
                                         "Comment/add_event_listeners_for_comments_buttons.js",

@@ -4,7 +4,6 @@
     <head>
         <title>Dublongold | @ViewData["Title"]</title>
         <meta charset="utf-8" />
-        <open-at>@DateTime.Now</open-at>
         @if(ViewData["css_files"] is List<string> css_files)
         {
             @foreach(string css_file in css_files)
@@ -12,6 +11,7 @@
                 <link href="/Css/@css_file" rel="stylesheet"/>
             }
         }
+        <meta open-at = "@DateTime.Now" />
     </head>
     <body>
         <div id = "title_elements_path_container">

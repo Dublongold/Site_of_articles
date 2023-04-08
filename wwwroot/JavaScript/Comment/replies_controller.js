@@ -5,8 +5,7 @@ async function replies_controller(this_element, comment_id)
         let article_id = get_article_id();
         this_element.disabled = true;
         
-        this_element.disabled = false;
-        let replies_count
+        let replies_count = 0;
         let replies_button_of_comment_status_text = this_element.getElementsByClassName("replies-button-of-comment-status-text")[0];
         let count_replies_of_comment = this_element.getElementsByClassName("count-replies-of-comment")[0];
         let comment_container = get_comment_container_by_comment_id(comment_id);
@@ -33,6 +32,11 @@ async function replies_controller(this_element, comment_id)
                         if(temp_reply_comments.hasAttribute("reply_to_comment") && temp_reply_comments.getAttribute("reply_to_comment") == comment_id)
                         {
                             add_event_listeners_for_comments_buttons(temp_reply_comments.getElementsByClassName("comment-container"));
+                            let load_more_comments_button = temp_reply_comments.querySelector(".load-more-comments");
+                            if(load_more_comments_button && load_more_comments_button.getAttribute("last_comment_id"))
+                            {
+                                load_more_comments_button.addEventListener("click", load_more_comments);
+                            }
                             break;
                         }
                     }
@@ -61,6 +65,7 @@ async function replies_controller(this_element, comment_id)
             }
         }
     }
+    this_element.disabled = false;
 }
 
 function change_replies_count_by_comment_id(comment_id, replies_count)

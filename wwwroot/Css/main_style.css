@@ -12,6 +12,10 @@ button{
 button:hover{
     border: 2px solid black;
 }
+button:disabled{
+    color: rgb(162, 159, 159);
+    background-color: rgba(52,53,65);
+}
 a{
     color:rgb(0 147 251);;
 }
@@ -20,8 +24,12 @@ input, textarea{
     color:rgb(255, 255, 255);
 }
 input[type="text"]:hover, textarea:hover{
-    border: 2px solid white;
+    border: 1px solid white;
     border-radius: 2px;
+}
+input[type="text"]::selection, textarea::selection{
+    color:rgb(0, 0, 0);
+    background-color: rgb(179, 179, 179);
 }
 input::placeholder, textarea::placeholder{
     color:rgb(187, 187, 187);

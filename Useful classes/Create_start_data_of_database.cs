@@ -148,6 +148,15 @@ namespace Dublongold_site.Useful_classes
                         Content = "Good article!",
                         Users_who_disliked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
                     });
+                db_context.Article_comments.Add(
+                    new Article_comment()
+                    {
+                        Id = 20,
+                        Article_id = 1,
+                        Author = db_context.User_accounts.First(ac => ac.Id == 2),
+                        Content = "Good article!!!",
+                        Users_who_disliked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
+                    });
                 db_context.SaveChanges();
             }
         }

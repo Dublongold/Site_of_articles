@@ -3,6 +3,7 @@ using Dublongold_site.Models;
 using Dublongold_site.Useful_classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Dublongold_site.Controllers
 {
@@ -19,13 +20,70 @@ namespace Dublongold_site.Controllers
         }
         [HttpGet]
         [Route("load_more")]
-        public IActionResult Load_more_comments(int last_comment_id, DateTime open_at)
+        public async Task<IActionResult> Load_more_comments(int comment_id, int article_id, string? sort_by)
         {
             using (db_context)
             {
+                if (comment_id > 0)
+                {
+                    Article_comment? last_comment = await db_context.Article_comments
+                        .Where(c => c.Id == comment_id && c.Article_id == article_id)
+                        .Include(c => c.Replying_comments)
+                        .Include(c => c.Reply_to_comment)
+                        .FirstOrDefaultAsync();
+                    if (last_comment is not null)
+                    {
+                        if (last_comment.Reply_to_comment is Article_comment main_comment)
+                        {
+                            ViewData["Main_comment"] = main_comment;
+                            await db_context.Entry(main_comment).Collection(c => c.Replying_comments).LoadAsync();
+                            foreach (Article_comment reply_comment in main_comment.Replying_comments)
+                            {
+                                await db_context.Entry(reply_comment).Collection(c => c.Users_who_liked).LoadAsync();
+                                await db_context.Entry(reply_comment).Collection(c => c.Users_who_disliked).LoadAsync();
+                                await db_context.Entry(reply_comment).Collection(c => c.Replying_comments).LoadAsync();
+                                await db_context.Entry(reply_comment).Reference(c => c.Author).LoadAsync();
+                            }
+                            List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(main_comment.Replying_comments, sort_by)
+                                .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id).Take(11).ToList();
+                            if (comments.Count > 10)
+                                Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
+                            return View("/Views/Comments/Load_comments.cshtml", comments.Take(10).ToList());
+                        }
+                        else
+                        {
+                            Article? article = await db_context.Articles.Where(art => art.Id == article_id)
+                                        .Include(c => c.Comments).FirstOrDefaultAsync();
+                            if (article is not null)
+                            {
+                                foreach (Article_comment temp_comment in article.Comments)
+                                {
+                                    await db_context.Entry(temp_comment).Collection(c => c.Users_who_liked).LoadAsync();
+                                    await db_context.Entry(temp_comment).Collection(c => c.Users_who_disliked).LoadAsync();
+                                }
 
+                                List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(article.Comments, sort_by)
+                                    .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id || c.Reply_to_comment != null).Take(11).ToList();
+                                foreach (Article_comment temp_comment in comments)
+                                {
+                                    await db_context.Entry(temp_comment).Collection(c => c.Replying_comments).LoadAsync();
+                                    await db_context.Entry(temp_comment).Reference(c => c.Author).LoadAsync();
+                                }
+                                Console.WriteLine(comments.Select(c => c.Id.ToString()).Aggregate((c1, c2) => c1 + ", " + c2));
+                                if (comments.Count > 10)
+                                    Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
+                                return View("/Views/Comments/Load_comments.cshtml", comments.Take(10).ToList());
+                            }
+                            else
+                                return NotFound();
+                        }
+                    }
+                    else
+                        return NotFound();
+                }
+                else
+                    return BadRequest();
             }
-            return BadRequest();
         }
         [HttpPost]
         [Route("create/{article_id:int}")]
@@ -134,6 +192,7 @@ namespace Dublongold_site.Controllers
         [Route("build_comments/{comment_id:int}/{article_id:int}")]
         public async Task<IActionResult> Build_replies_comments(int comment_id, int article_id)
         {
+            string? sort_by = Request.Headers["sort-by"];
             using (db_context)
             {
                 Article_comment? comment = await db_context.Article_comments
@@ -152,10 +211,10 @@ namespace Dublongold_site.Controllers
                     ViewData["Main_comment"] = comment;
                     HttpContext.Response.Headers.Add("replies-count", comment.Replying_comments.Count.ToString());
 
-                    List<Article_comment> comments = comment.Replying_comments.OrderBy(c => c.Users_who_liked.Count - c.Users_who_disliked.Count).ThenByDescending(c => c.Created).ThenBy(c => c.Id).Take(10).ToList();
-                    if (comment.Replying_comments.Count > 10)
-                        ViewData["last-comment-id"] = comment.Replying_comments[10].Id;
-                    return View("/Views/Comments/Comments_builder.cshtml", comments);
+                    List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(comment.Replying_comments, sort_by).Take(11).ToList();
+                    if (comments.Count > 10)
+                        ViewData["last-comment-id"] = comments.Last().Id;
+                    return View("/Views/Comments/Comments_builder.cshtml", comments.Take(10).ToList());
                 }
                 else
                 {
