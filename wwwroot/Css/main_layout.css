@@ -6,6 +6,9 @@
     text-align: center;
     line-height: 0%;
 }
+open-at{
+    display:none;
+}
 .dublongold-home-button > span{
     position: absolute;
     top: 50%;
