@@ -39,3 +39,10 @@
 .find-criterias-and-button-container{
     padding: 3px;
 }
+.find-options-text{
+    display:block;
+    margin-bottom: 10px;
+}
+#find_button{
+    margin-top: 10px;
+}

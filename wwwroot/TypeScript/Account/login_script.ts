@@ -4,13 +4,14 @@ function login()
     var password_label_element = document.createElement("label");
     var login_textbox_element = document.createElement("input");
     var password_textbox_element = document.createElement("input");
-    var error_message = document.createElement("span");
 
     var form_for_login = document.createElement("form");
 
     let error_message_login_path = document.createElement("div");
     
     form_for_login.id = "form_for_login_elements";
+    form_for_login.method = "post";
+    form_for_login.action = "/account/login";
     
     login_label_element.innerText = "Логін:";
     password_label_element.innerText = "Пароль:";
@@ -18,19 +19,19 @@ function login()
     login_textbox_element.name = "Login";
     login_textbox_element.id = "login_path_login";
 
-    error_message.id = "login_error_message";
-
     password_textbox_element.name = "Password";
     password_textbox_element.id = "login_path_password";
     password_textbox_element.type = "password";
 
     var login_button = document.createElement("button");
-    login_button.innerText = "Увійти";
+    login_button.id = "login_submit_button";
+    login_button.textContent = "Увійти";
     login_button.type = "button";
     login_button.addEventListener("click", submit_login_data);
     
     var cancel_button = document.createElement("button");
-    cancel_button.innerText = "Скасувати";
+    cancel_button.id = "login_cancel_button";
+    cancel_button.textContent = "Скасувати";
     cancel_button.type = "button";
     cancel_button.addEventListener("click", cancel_login);
 
@@ -46,17 +47,21 @@ function login()
         temp_div_elem.appendChild(elem);
         form_for_login.appendChild(temp_div_elem);
     }
+    /*
     let error_message_container = document.createElement("div") as HTMLDivElement;
     error_message_container.className = "login-path-error-message";
 
-    form_for_login.appendChild(error_message_container);
+    form_for_login.appendChild(error_message_container);*/
 
     var div_for_login_path = document.getElementById("div_for_login_path") as HTMLDivElement;
-    while(div_for_login_path.firstChild !== null && div_for_login_path.firstChild != undefined)
+    if(div_for_login_path)
     {
-        div_for_login_path.removeChild(div_for_login_path.firstChild);
+        while(div_for_login_path.firstChild !== null && div_for_login_path.firstChild != undefined)
+        {
+            div_for_login_path.removeChild(div_for_login_path.firstChild);
+        }
+        div_for_login_path.appendChild(form_for_login);
     }
-    div_for_login_path.appendChild(form_for_login);
 }
 
 async function logout()
@@ -65,6 +70,7 @@ async function logout()
 
     if(result.ok)
     {
+        disable_all_buttons();
         document.location.reload();
     }
 }
@@ -96,10 +102,10 @@ async function cancel_login()
 }
 async function submit_login_data()
 {
-
+    let form_for_login = document.getElementById("form_for_login_elements") as HTMLFormElement;
     const source = "Вхід в обліковий запис";
     let error_message = "";
-    let where_append = document.getElementById("form_for_login_elements");
+    let where_append = form_for_login;
     const error_message_id = "login_path";
 
     let login_texbox_element = document.getElementById("login_path_login") as HTMLInputElement;
@@ -110,31 +116,31 @@ async function submit_login_data()
     }
     else
     {
-        const result = await fetch(`/account/login/?login=${login_texbox_element.value}&password=${password_texbox_element.value}`,{method:"post"});
-        const result_text = await result.text();
-
-        if(result.ok)
+        const login_request = await fetch(`/account/login/`, {method:"post", body:new FormData(form_for_login)});
+        const login_request_text = await login_request.text();
+        if(login_request.ok)
         {
             document.location.reload();
             return;
         }
         else
         {
-            if(result_text === "invalid_login")
+            if(login_request_text === "invalid_login")
             {
                 error_message = `Не знайдено користувача з логіном "${login_texbox_element.value}".`;
             }
-            else if(result_text === "invalid_password")
+            else if(login_request_text === "invalid_password")
             {
                 error_message = `Неправильний пароль.`;
             }
             else
             {
-                error_message = `Виникла неочікувана помилка...`;
+                error_message = `Виникла неочікувана помилка з кодом ${login_request.status}...`;
             }
         }
     }
-    error_message_editor(source, error_message, where_append, error_message_id);
+    if(error_message)
+        error_message_editor(source, error_message, where_append, error_message_id);
 }
 
 function follow_to_article_create()
@@ -153,6 +159,9 @@ document.addEventListener("DOMContentLoaded", function(){
     let register_button = document.getElementById("register_button");
     let logout_button = document.getElementById("logout_button");
 
+    let login_submit_button = document.getElementById("login_submit_button");
+    let login_cancel_button = document.getElementById("login_cancel_button");
+
     if(follow_to_article_create_button)
     {
         follow_to_article_create_button.addEventListener("click", follow_to_article_create);
@@ -167,10 +176,21 @@ document.addEventListener("DOMContentLoaded", function(){
     }
     if(register_button)
     {
-        register_button.addEventListener("click", function(){document.location.assign("/account/register")})
+        register_button.addEventListener("click", function(){
+            disable_all_buttons();
+            document.location.assign("/account/register");
+        })
     }
     if(logout_button)
     {
         logout_button.addEventListener("click", logout);
+    }
+    if(login_submit_button)
+    {
+        login_submit_button.addEventListener("click", submit_login_data);
+    }
+    if(login_cancel_button)
+    {
+        login_cancel_button.addEventListener("click", cancel_login);
     }
 });

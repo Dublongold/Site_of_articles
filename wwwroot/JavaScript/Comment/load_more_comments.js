@@ -3,22 +3,26 @@ async function load_more_comments(event) {
     let this_element = event.currentTarget;
     if (this_element) {
         let last_comment_id = this_element.getAttribute("last_comment_id");
-        let article_id = get_article_id();
+        /* Ця частина коду чомусь була потрібна для цього... Чому? Не знаю, але бажання це писати ще раз у тебе немає.
         let open_at_elements = document.querySelectorAll("meta");
-        let open_at = null;
-        for (let meta_elem of Array.from(open_at_elements)) {
-            if (meta_elem) {
+        let open_at: string | null = null;
+        for(let meta_elem of Array.from(open_at_elements))
+        {
+            if(meta_elem)
+            {
                 let meta_elem_open_at = meta_elem.getAttribute("open-at");
-                if (meta_elem_open_at) {
+                if(meta_elem_open_at)
+                {
                     open_at = meta_elem_open_at;
                 }
             }
         }
-        if (open_at === null) {
+        if(open_at === null)
+        {
             open_at = "01.01.0001 00:00:01";
-        }
+        }*/
         if (last_comment_id && article_id) {
-            const load_request = await fetch(`/comment/load_more/?comment_id=${last_comment_id}&article_id=${article_id}&open_at=${open_at}`);
+            const load_request = await fetch(`/comment/load_more/?comment_id=${last_comment_id}&article_id=${article_id}`);
             if (load_request.ok) {
                 this_element.insertAdjacentHTML("beforebegin", await load_request.text());
                 last_comment_id = load_request.headers.get("last-comment-id");

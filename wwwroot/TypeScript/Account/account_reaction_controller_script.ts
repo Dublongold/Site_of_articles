@@ -41,16 +41,16 @@ async function account_reaction(this_element: HTMLButtonElement, other_element:H
                     }
                     if(result_text == "a")
                     {
-                        this_element.style.backgroundColor = `#${is_like?"8eff":"ff8e"}8e`;
+                        this_element.style.backgroundColor = button_colors[is_like?1:0];
                     }
                     else if(result_text == "r")
                     {
-                        this_element.style.backgroundColor = "unset";
+                        this_element.style.backgroundColor = button_colors[2];
                     }
                     else if(result_text == "c")
                     {
-                        this_element.style.backgroundColor = `#${is_like?"8eff":"ff8e"}8e`;
-                        other_element.style.backgroundColor = "unset";
+                        this_element.style.backgroundColor = button_colors[is_like?1:0];
+                        other_element.style.backgroundColor = button_colors[2];
                         other_count.textContent = result.headers.get(`${reaction_text_of_other}-count`);
                     }
                 }

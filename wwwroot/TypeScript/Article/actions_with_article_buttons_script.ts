@@ -3,7 +3,7 @@ function open_article(event: PointerEvent, article_id: string)
     let this_element = event.currentTarget as HTMLButtonElement;
     if(this_element)
     {
-        this_element.disabled = true;
+        disable_all_buttons();
         window.location.assign(`/article/read/${article_id}`);
     }
 }
@@ -48,6 +48,7 @@ async function sure_delete_article(article_id: string)
     let result = await fetch(`/article/delete/${article_id}`, {method:"post"});
     if(result.ok)
     {
+        disable_all_buttons();
         window.location.reload();
     }
     else

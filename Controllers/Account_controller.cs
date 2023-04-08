@@ -6,11 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using Dublongold_site.Filters;
 using Dublongold_site.Useful_classes;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Xml.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Dublongold_site.Controllers
 {
@@ -33,11 +29,13 @@ namespace Dublongold_site.Controllers
         }
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login(string Login, string Password)
+        public async Task<IActionResult> Login(User_login_data login_data)
         {
+            if (login_data is null)
+                return BadRequest();
             using (db_context)
             {
-                User_account? user = await db_context.User_accounts.Where(u => u.Login == Login).FirstOrDefaultAsync();
+                User_account? user = await db_context.User_accounts.Where(u => u.Login == login_data.Login).FirstOrDefaultAsync();
                 if (user is not null)
                 {
                     await db_context.Entry(user).Collection(u => u.Articles).LoadAsync();
@@ -46,7 +44,7 @@ namespace Dublongold_site.Controllers
                 {
                     return NotFound("invalid_login");
                 }
-                else if (user.Password != Password)
+                else if (user.Password != login_data.Password)
                 {
                     return BadRequest("invalid_password");
                 }
@@ -309,4 +307,5 @@ namespace Dublongold_site.Controllers
             }
         }
     }
+    public record User_login_data(string Login, string Password);
 }

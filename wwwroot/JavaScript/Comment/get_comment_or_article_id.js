@@ -1,6 +1,6 @@
 "use strict";
 /*
-    Шукає коментар по тому айді, який був переданий в цю функцію. Якщо знайде, то відразу його поверне, інакше поверне undefined.
+    Шукає коментар по тому айді, який був переданий в цю функцію. Якщо знайде, то відразу його поверне, інакше поверне null.
 */
 function get_comment_container_by_comment_id(comment_id) {
     let comments_container = document.getElementsByClassName("comment-container");
@@ -11,6 +11,9 @@ function get_comment_container_by_comment_id(comment_id) {
     }
     return null;
 }
+/*
+    Знаходить id статті, яка була відкрита. Якщо є можливість знайти, повертає рядок із цим значенням, інакше - null.
+ */
 function get_article_id() {
     let article_body = document.getElementById("article_body");
     if (article_body) {

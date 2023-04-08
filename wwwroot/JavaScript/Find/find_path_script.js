@@ -42,8 +42,10 @@ function validation_find_form(event) {
             }
         }
         if (any_find_options_selected) {
-            if (find_form && find_form.submit !== undefined)
+            if (find_form && find_form.submit !== undefined) {
+                disable_all_buttons();
                 find_form.submit();
+            }
             else
                 error_message = "Не знайдено форми, яка б відправила дані для пошуку ваших статтей";
         }

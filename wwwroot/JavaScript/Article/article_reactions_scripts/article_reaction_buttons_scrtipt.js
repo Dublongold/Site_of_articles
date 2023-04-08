@@ -4,8 +4,6 @@ async function article_reaction(this_element, other_element, is_like) {
         this_element.disabled = true;
         let reaction_text_of_this = is_like ? "like" : "dislike";
         let reaction_text_of_other = !is_like ? "like" : "dislike";
-        let button_colors = ["rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)"];
-        let article_id = get_article_id();
         let this_count = document.getElementById(`${reaction_text_of_this}_count_of_article`);
         let other_count = document.getElementById(`${reaction_text_of_other}_count_of_article`);
         const source = `Кнопка "${is_like ? "П" : "Не п"}одобається"`;

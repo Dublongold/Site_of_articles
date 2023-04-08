@@ -2,7 +2,6 @@ async function write_comment(event)
 {
     let submit_write_comment_button = event.currentTarget;
     submit_write_comment_button.disabled = true;
-    let article_id = get_article_id();
     let write_content_of_comment = document.getElementById("write_content_of_comment");
     const source = "Створення коментаря";
     let error_message = "";

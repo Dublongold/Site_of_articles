@@ -4,7 +4,7 @@ async function load_more_comments(event: PointerEvent)
     if(this_element)
     {
         let last_comment_id = this_element.getAttribute("last_comment_id");
-        let article_id = get_article_id();
+        /* Ця частина коду чомусь була потрібна для цього... Чому? Не знаю, але бажання це писати ще раз у тебе немає.
         let open_at_elements = document.querySelectorAll("meta");
         let open_at: string | null = null;
         for(let meta_elem of Array.from(open_at_elements))
@@ -21,7 +21,7 @@ async function load_more_comments(event: PointerEvent)
         if(open_at === null)
         {
             open_at = "01.01.0001 00:00:01";
-        }
+        }*/
         if(last_comment_id && article_id)
         {
             const load_request = await fetch(`/comment/load_more/?comment_id=${last_comment_id}&article_id=${article_id}`);

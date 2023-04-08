@@ -2,7 +2,7 @@
 function open_article(event, article_id) {
     let this_element = event.currentTarget;
     if (this_element) {
-        this_element.disabled = true;
+        disable_all_buttons();
         window.location.assign(`/article/read/${article_id}`);
     }
 }
@@ -35,6 +35,7 @@ function not_sure_delete_article(event, article_id, event_for_remove) {
 async function sure_delete_article(article_id) {
     let result = await fetch(`/article/delete/${article_id}`, { method: "post" });
     if (result.ok) {
+        disable_all_buttons();
         window.location.reload();
     }
     else {

@@ -36,17 +36,14 @@ async function save_changes_of_comment_content(event, comment_id, reference_to_c
         let current_target = event.currentTarget;
         if (current_target) {
             current_target.disabled = true;
-            const article_id = get_article_id();
             let comment_container = get_comment_container_by_comment_id(comment_id);
             const source = "Редагування: зберегти";
             let error_message = "";
             let where_append;
-            if (comment_container && comment_container.firstElementChild) {
+            if (comment_container && comment_container.firstElementChild)
                 where_append = comment_container.firstElementChild;
-            }
-            else {
+            else
                 where_append = null;
-            }
             const error_message_id = "save_edit_content_of_comment_with_id" + comment_id;
             if (comment_container) {
                 let comment_content_container = comment_container.getElementsByClassName("comment-content-container")[0];

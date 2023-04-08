@@ -66,7 +66,7 @@ async function validate_register_form(event: PointerEvent)
             }
             else
             {
-                register_field_error_message_editor(register_user_data_error_ids.login, "Логін має містити лише букви, числа та символ нижнього підкреслювання.");
+                register_field_error_message_editor(register_user_data_error_ids.login, "Логін має містити лише букви, числа та символи нижнього підкреслювання.");
             }
         }
         else
@@ -83,7 +83,7 @@ async function validate_register_form(event: PointerEvent)
         if(register_user_password.value && register_user_password.value.trim().length > 0)
         {
             let password_value = register_user_password.value.trim();
-            if(password_value.length < 6)
+            if(!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})/.test(password_value))
             {
                 register_field_error_message_editor(register_user_data_error_ids.password, "Пароль має мати довжину мінімум 6 символів.");
             }
@@ -204,6 +204,28 @@ function clear_register_error_message(error_message_id: string)
     }
 }
 
+function check_password(event: Event)
+{
+    let this_element = event.currentTarget as HTMLInputElement;
+    if(this_element)
+    {
+        let test_password = this_element.value;
+        if(strong_password.test(test_password))
+        {
+            this_element.style.backgroundColor = "green";
+        }
+        else if(medium_password.test(test_password))
+        {
+            this_element.style.backgroundColor = "yellow";
+        }
+        else
+        {
+            this_element.style.backgroundColor = "red";
+        }
+
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function(){
     const register_user_data_ids = [
         ["register_user_name", "register_user_name_error"],
@@ -226,4 +248,12 @@ document.addEventListener("DOMContentLoaded", function(){
             rudei_input.addEventListener("input", function(){clear_register_error_message(rudei[1])});
         }
     }
+    let register_user_password = document.getElementById("register_user_password");
+    if(register_user_password)
+    {
+        register_user_password.addEventListener("change", check_password);
+    }
 })
+
+let strong_password = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})');
+let medium_password = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))');

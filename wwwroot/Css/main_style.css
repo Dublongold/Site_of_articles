@@ -12,6 +12,14 @@ button{
 button:hover{
     border: 2px solid black;
 }
+
+button:active{
+    border-top: 2px solid black;
+    border-bottom: 2px solid rgb(84, 84, 84);
+    border-right: 2px solid rgb(84, 84, 84);
+    border-left: 2px solid black;
+}
+
 button:disabled{
     color: rgb(162, 159, 159);
     background-color: rgba(52,53,65);

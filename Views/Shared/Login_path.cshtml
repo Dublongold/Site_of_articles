@@ -13,15 +13,16 @@
                 await db_context.Entry(user_account).Collection(u => u.Comments).LoadAsync();
                 await db_context.Entry(user_account).Collection(u => u.Articles_which_been_read).LoadAsync();
             }
-            
+
         }
     }
+    string? login_error_message = TempData["login-error-message"] as string;
 }
-@if(user_account is null)
+@if(user_account is null && login_error_message is null)
 {
     <button id="login_button">Увійти</button> <button id="register_button">Зареєструватися</button>
 }
-else
+else if (login_error_message is null)
 {
 <div class="login-path-container">
     <div class="user-main-data-container">
@@ -45,4 +46,16 @@ else
     <button type="button" id = "follow_to_article_create_button">Написати нову статтю</button>
     <button type="button" id = "follow_to_user_articles_button">Ваші статті</button>
 </div>
+}
+else
+{
+    <form id = "form_for_login_elements" action="account/login" method="post">
+        <label for = "login_path_login">Логін:</label>
+        <input name = "Login" id = "login_path_login"/>
+        <button type="button" id="login_submit_button">Увійти</button>
+        <div id = "error_message_login_path" class = "error-message">@login_error_message</div>
+        <label for = "login_path_password">Пароль:</label>
+        <input name = "Password" id = "login_path_password" type = "password"/>
+        <button type="button" id="login_cancel_button">Скасувати</button>
+    </form>
 }

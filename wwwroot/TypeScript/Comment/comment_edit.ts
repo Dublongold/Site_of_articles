@@ -50,19 +50,14 @@ async function save_changes_of_comment_content(event:PointerEvent, comment_id:st
         if(current_target)
         {
             current_target.disabled = true;
-            const article_id = get_article_id();
             let comment_container = get_comment_container_by_comment_id(comment_id);
             const source = "Редагування: зберегти";
             let error_message = "";
             let where_append: HTMLElement|null;
             if(comment_container && comment_container.firstElementChild)
-            {
                 where_append = comment_container.firstElementChild as HTMLElement;
-            }
             else
-            {
                 where_append = null;
-            }
             const error_message_id = "save_edit_content_of_comment_with_id" + comment_id;
             if(comment_container)
             {

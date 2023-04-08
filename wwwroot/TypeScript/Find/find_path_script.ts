@@ -4,7 +4,7 @@ async function check_search_options(event: PointerEvent, checkbox_param: string[
     if(checkbox_elem && checkbox_elem.checked !== null && checkbox_elem.checked !== undefined)
     {
         delete_find_error_message();
-        await fetch(`/find/options/${checkbox_param[1]}/?option_value=${checkbox_elem.checked}`, {method:"post"})
+        await fetch(`/find/options/${checkbox_param[1]}/?option_value=${checkbox_elem.checked}`, {method:"post"});
     }
     else
     {
@@ -58,7 +58,10 @@ function validation_find_form(event: PointerEvent)
         if(any_find_options_selected)
         {
             if(find_form && find_form.submit !== undefined)
+            {
+                disable_all_buttons();
                 find_form.submit();
+            }
             else
                 error_message = "Не знайдено форми, яка б відправила дані для пошуку ваших статтей";
         }

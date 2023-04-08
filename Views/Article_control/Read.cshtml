@@ -90,26 +90,30 @@
 
             if (ViewData["js_files"] is List<string> js_files)
             {
-                string[] src_paths = { "Article/article_reactions_scripts/article_reaction_buttons_scrtipt.js",
-                                        "Article/article_read_controller.js",
-                                        "Comment/comment_reaction_scripts/comment_reaction.js",
-                                        "Comment/comment_reaction_scripts/change_comment_color_script.js",
-                                        "Comment/write_comment.js", "Comment/comment_edit.js", "Comment/comment_delete.js",
-                                        "Comment/replies_controller.js", "Comment/write_reply_button.js",
-                                        "Comment/add_event_listeners_for_comments_buttons.js",
-                                        "Comment/get_comment_or_article_id.js",
-                                        "Comment/load_more_comments.js"
-                                    };
+                string[] src_paths = { 
+                    "Comment/get_comment_or_article_id.js",
+                    "Article/article_read_controller.js",
+                    "Article/article_reactions_scripts/article_reaction_buttons_scrtipt.js",
+                    "Comment/comment_reaction_scripts/comment_reaction.js",
+                    "Comment/comment_reaction_scripts/change_comment_color_script.js",
+                    "Comment/write_comment.js", 
+                    "Comment/comment_edit.js",
+                    "Comment/comment_delete.js",
+                    "Comment/replies_controller.js",
+                    "Comment/write_reply_button.js",
+                    "Comment/add_event_listeners_for_comments_buttons.js",
+                    "Comment/load_more_comments.js"
+                    };
                 js_files.AddRange(src_paths);
             }
         }
         else
         {
-            <p><em>Коли ви створете статтю, то тоді тут будуть коментарі...</em></p>
+            <p><em>Коли ви закінчите зі статтею, тут будуть коментарі...</em></p>
         }
     }
     else
     {
-        <em>Вибачте, але чомусь ця стаття пуста...</em>
+        <em>Вибачте, але чомусь ця стаття порожня...</em>
     }
 </div>

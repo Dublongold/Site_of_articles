@@ -2,7 +2,6 @@ async function replies_controller(this_element, comment_id)
 {
     if(this_element.hasAttribute("replies_are_hidened"))
     {
-        let article_id = get_article_id();
         this_element.disabled = true;
         
         let replies_count = 0;

@@ -7,16 +7,12 @@ async function comment_reaction(this_element: HTMLButtonElement, other_element:H
         let reaction_text_of_this = is_like?"like":"dislike";
         let reaction_text_of_other = !is_like?"like":"dislike";
 
-        let button_colors = ["rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)"];
-
         const source = `Кнопка "${is_like?"П":"Не п"}одобається"`;
         let error_message = "";
         let this_parent = this_element.parentElement;
         let where_append = this_parent && this_parent.parentElement ? this_parent.parentElement : null;
         const error_message_id = "article_reaction";
-
-        let article_id = get_article_id();
-
+        
         let comment_element = get_comment_container_by_comment_id(comment_id);
         if(comment_element)
         {

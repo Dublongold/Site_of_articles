@@ -10,7 +10,6 @@ async function sure_delete_comment(this_element, comment_id)
 {
     this_element.disabled = true;
     this_element.setAttribute("start_delete_comment", "true");
-    let article_id = get_article_id();
     let result = await fetch(`/comment/delete/${comment_id}/${article_id}`, {method:"delete"});
 
     let comment_container = get_comment_container_by_comment_id(comment_id);

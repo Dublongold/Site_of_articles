@@ -1,5 +1,5 @@
 /*
-    Шукає коментар по тому айді, який був переданий в цю функцію. Якщо знайде, то відразу його поверне, інакше поверне undefined.
+    Шукає коментар по тому айді, який був переданий в цю функцію. Якщо знайде, то відразу його поверне, інакше поверне null.
 */
 function get_comment_container_by_comment_id(comment_id:string|null): HTMLDivElement | null
 {
@@ -13,7 +13,9 @@ function get_comment_container_by_comment_id(comment_id:string|null): HTMLDivEle
     }
     return null;
 }
-
+/*
+    Знаходить id статті, яка була відкрита. Якщо є можливість знайти, повертає рядок із цим значенням, інакше - null.
+ */
 function get_article_id()
 {
     let article_body = document.getElementById("article_body");

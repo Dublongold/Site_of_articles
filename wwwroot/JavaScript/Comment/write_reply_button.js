@@ -73,7 +73,6 @@ function create_elements_for_write_reply(comment_container, comment_id) {
 }
 async function submit_write_reply_comment(this_element, comment_id) {
     this_element.disabled = true;
-    let article_id = get_article_id();
     let write_reply_content_elements = document.getElementsByClassName("write-reply-content");
     let write_reply_name_text_elements = document.getElementsByClassName("write-reply-name-text");
     let submit_write_reply_elements = document.getElementsByClassName("submit-write-reply");
