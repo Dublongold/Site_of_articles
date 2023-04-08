@@ -78,7 +78,7 @@
                 <div id="unauthorized_cannot_write_comments_text">Тільки авторизовані користувачі можуть залишати коментарі...</div>
             }
             <hr />
-            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", Model.Comments.OrderByDescending(c => c.Created_date).ThenBy(c => c.Id).ToList())
+            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", Model.Comments.OrderByDescending(c => c.Created).ThenBy(c => c.Id).ToList())
 
             if (ViewData["js_files"] is List<string> js_files)
             {

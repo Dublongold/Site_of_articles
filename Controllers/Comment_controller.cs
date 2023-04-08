@@ -17,6 +17,16 @@ namespace Dublongold_site.Controllers
         {
             db_context = new_db_context;
         }
+        [HttpGet]
+        [Route("load_more")]
+        public IActionResult Load_more_comments(int last_comment_id, DateTime open_at)
+        {
+            using (db_context)
+            {
+
+            }
+            return BadRequest();
+        }
         [HttpPost]
         [Route("create/{article_id:int}")]
         public IActionResult Create_comment(int article_id, string comment_content, int reply_level, int comment_id)
@@ -104,7 +114,7 @@ namespace Dublongold_site.Controllers
                                 HttpContext.Response.Headers.Add("replies-count",
                                     db_context.Article_comments.Where(c => c.Id == main_comment_id && c.Article_id == article_id)
                                                     .Include(c => c.Replying_comments)
-                                                        .FirstOrDefault()?.Replying_comments.Count().ToString() ?? "0");
+                                                        .FirstOrDefault()?.Replying_comments.Count.ToString() ?? "0");
                             }
                             return Ok(db_context.Article_comments.Where(c => c.Article_id == article_id).Count());
                         }
@@ -142,7 +152,10 @@ namespace Dublongold_site.Controllers
                     ViewData["Main_comment"] = comment;
                     HttpContext.Response.Headers.Add("replies-count", comment.Replying_comments.Count.ToString());
 
-                    return View("/Views/Comments/Comments_builder.cshtml", comment.Replying_comments.OrderByDescending(c => c.Created_date).ThenBy(c => c.Id).ToList());
+                    List<Article_comment> comments = comment.Replying_comments.OrderBy(c => c.Users_who_liked.Count - c.Users_who_disliked.Count).ThenByDescending(c => c.Created).ThenBy(c => c.Id).Take(10).ToList();
+                    if (comment.Replying_comments.Count > 10)
+                        ViewData["last-comment-id"] = comment.Replying_comments[10].Id;
+                    return View("/Views/Comments/Comments_builder.cshtml", comments);
                 }
                 else
                 {

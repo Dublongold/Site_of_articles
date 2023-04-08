@@ -32,9 +32,9 @@
             }
             await Html.RenderPartialAsync("/Views/Comments/Comment_builder.cshtml",comment);
         }
-        @if(Model.Count > 10)
+        @if(ViewData["last-comment-id"] is int last_comment_id_var)
         {
-            <button id="load_more_comments" last_comment_id = "@Model[11].Id">Завантажити ще...</button>
+            <button id="load_more_comments" last_comment_id = "@last_comment_id_var">Завантажити ще...</button>
         }
     }
     else

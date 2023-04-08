@@ -21,7 +21,7 @@
 <div class = "preview-articles-container">
     @if (Model is not null && Model.Count > 0)
     {
-        @foreach (Article article in Model.OrderByDescending(art => art.Users_who_liked.Count - art.Users_who_disliked.Count).Take(10).ToList())
+        @foreach (Article article in Model)
         {
         <div class = "preview-article-container">
             <div class="preview-article-data-container">
@@ -58,9 +58,9 @@
             </div>
         </div>
         }
-        @if(Model.Count > 10)
+        @if(ViewData["last-article-id"] is int last_id)
         {
-            <button id="load_more_articles" last_article_id = "@Model[11].Id">Завантажити ще...</button>
+            <button id="load_more_articles" last_article_id = "@last_id">Завантажити ще...</button>
         }
     }
     else

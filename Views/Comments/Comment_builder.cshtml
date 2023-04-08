@@ -67,9 +67,9 @@
                 </div>
                 @*Дата та час створення коментаря*@
                 <span class="comment-date">
-                    @Model.Created_date.ToShortDateString()
+                    @Model.Created.ToShortDateString()
                     <br />
-                    @Model.Created_date.ToShortTimeString()
+                    @Model.Created.ToShortTimeString()
                 </span>
                 @*Контент коментаря*@
                 <div class="comment-content-container">@Html.Raw(Model.Content)</div>

@@ -2,7 +2,7 @@
 
 namespace Dublongold_site.Models
 {
-    public class Article_comment : ICan_like_and_dislike
+    public class Article_comment : ICan_like_and_dislike, ISort_object
     {
         public int Id { get; set; }
         public int Article_id { get; set; }
@@ -10,7 +10,7 @@ namespace Dublongold_site.Models
         public int Author_id { get; set; }
         public User_account Author { get; set; } = null!;
         public string Content { get; set; } = null!;
-        public DateTime Created_date { get; set; } = DateTime.Now;
+        public DateTime Created { get; init; } = DateTime.Now;
         public List<Article_comment> Replying_comments { get; set; } = new();
         public DateTime Edited_date { get; set; }
         public int? Who_edit_id { get; set; }

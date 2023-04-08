@@ -2,6 +2,8 @@
 using Dublongold_site.Models;
 using Microsoft.AspNetCore.Mvc;
 using Dublongold_site.Filters;
+using System.Collections.Specialized;
+using Dublongold_site.Useful_classes;
 
 namespace Dublongold_site.Controllers
 {
@@ -26,22 +28,29 @@ namespace Dublongold_site.Controllers
 
         [Route("")]
         [Route("home")]
-        public async Task<IActionResult> Home()
+        public IActionResult Home()
         {
             using (db_context)
             {
-                return View("Home", await db_context.Articles.Include(art => art.Authors)
-                                                    .Include(art => art.Users_who_liked)
-                                                    .Include(art => art.Users_who_disliked)
-                                                    .Include(art => art.Users_who_have_read)
-                                                    .Include(art => art.Comments)
-                                                    .ToListAsync());
+                string? sort_by = Request.Headers["sort-by"];
+                IQueryable<Article> articles_sequence = db_context.Articles.Include(art => art.Authors)
+                                                .Include(art => art.Users_who_liked).Include(art => art.Users_who_disliked)
+                                                .OrderBy(art => art.Users_who_liked.Count - art.Users_who_disliked.Count)
+                                                .ThenBy(art => art.Created).ThenBy(art => art.Id)
+                                                .Include(art => art.Users_who_have_read)
+                                                .Include(art => art.Comments);
+                List<Article> articles = Sort_sequence_by.Sort_article_by(articles_sequence, sort_by).Take(11).ToList();
+
+                if (articles.Count > 10)
+                    ViewData["last-article-id"] = articles.Last().Id;
+                return View("Home", articles.Take(10).ToList());
             }
         }
         [HttpGet]
         [Route("find")]
         public async Task<IActionResult> Find(string name_or_text_of_article)
         {
+            string? sort_by = Request.Headers["sort-by"];
             name_or_text_of_article ??= "";
 
             if(name_or_text_of_article == "")
@@ -71,21 +80,21 @@ namespace Dublongold_site.Controllers
                 List<Article> articles = await db_context
                     .Articles
                     .Include(a => a.Authors).ToListAsync();
-                    articles = articles.Where(
-                        a => (find_theme && a.Theme.ToLower().Contains(name_or_text_of_article))
-                        || (find_tags && a.Tags.ToLower().Contains(name_or_text_of_article))
-                        || (find_description && a.Content.ToLower().Contains(name_or_text_of_article))
-                        || (find_content && a.Description.ToLower().Contains(name_or_text_of_article))
-                        || (find_authors && (a.Authors
-                            .Select(u => u.Name + " " + u.Surname + " " + u.Login)
-                            .Aggregate((u1, u2) => u1 + " " + u2)
-                            .ToLower()
-                            .Contains(name_or_text_of_article)
-                                            )
-                            )
-                        || (find_id && a.Id.ToString().ToLower().Contains(name_or_text_of_article))
+                IEnumerable<Article> article_sequence = articles.Where(
+                    a => (find_theme && a.Theme.ToLower().Contains(name_or_text_of_article))
+                    || (find_tags && a.Tags.ToLower().Contains(name_or_text_of_article))
+                    || (find_description && a.Content.ToLower().Contains(name_or_text_of_article))
+                    || (find_content && a.Description.ToLower().Contains(name_or_text_of_article))
+                    || (find_authors && (a.Authors
+                        .Select(u => u.Name + " " + u.Surname + " " + u.Login)
+                        .Aggregate((u1, u2) => u1 + " " + u2)
+                        .ToLower()
+                        .Contains(name_or_text_of_article)
+                                        )
                         )
-                    .ToList();
+                    || (find_id && a.Id.ToString().ToLower().Contains(name_or_text_of_article))
+                    );
+                articles = Sort_sequence_by.Sort_article_by(article_sequence, sort_by).Take(10).ToList();
                 foreach (Article article in articles)
                 {
                     db_context.Entry(article).Collection(art => art.Users_who_liked).Load();

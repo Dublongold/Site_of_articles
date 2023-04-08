@@ -99,7 +99,7 @@ function cancel_editing_comment_content(event, set_comment_content, comment_id, 
             current_target.disabled = true;
             let comment_container = get_comment_container_by_comment_id(comment_id);
             if (comment_container) {
-                let comment_content_container = comment_container.getElementsByClassName("comment-content-container")[0];
+                let comment_content_container = comment_container.querySelector(".comment-content-container");
                 if (comment_content_container && comment_content_container.hasAttribute("edit_comment_content")) {
                     cancel_editing_comment_content_function(current_target, comment_id, comment_content_container, set_comment_content, reference_to_button_function);
                 }

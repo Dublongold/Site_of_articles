@@ -1,5 +1,4 @@
-declare function replies_controller(this_element:HTMLButtonElement, comment_id:string):void;
-declare function create_reply_field_to_comment(this_element:HTMLButtonElement, comment_id:string):void;
+declare function replies_controller(this_element:HTMLButtonElement, comment_id:string):Promise<void>;
 declare function delete_comment(event:PointerEvent, comment_id:string, reference_to_button_function:EventListenerOrEventListenerObject):void;
 
 function add_event_listeners_for_comments_buttons(comment_container_elements:HTMLCollectionOf<Element>|null)

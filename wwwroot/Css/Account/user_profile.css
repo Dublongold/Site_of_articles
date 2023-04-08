@@ -8,9 +8,9 @@
 
 }
 
-/*#change_user_photo_container{
-    border-
-}*/
+#change_user_photo_container > fieldset{
+    text-align: center;
+}
 .user-profile-info{
     padding:5px 12px 5px 12px;
     display:grid;
@@ -85,7 +85,10 @@
     overflow-wrap: anywhere;
 }
 #change_user_photo_input{
-    display:block;
+    display:none;
+}
+#change_user_photo_button{
+    width:50%;
 }
 #reactions_to_user_account{
     border-top: 1px solid gray;

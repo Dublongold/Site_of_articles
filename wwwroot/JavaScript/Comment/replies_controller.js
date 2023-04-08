@@ -14,7 +14,7 @@ async function replies_controller(this_element, comment_id)
         {
             if(this_element.getAttribute("replies_are_hidened").toLowerCase() === "true")
             {
-                let result = await fetch(`/comment/build_comments/${comment_id}/${article_id}}`,{method:"post"});
+                let result = await fetch(`/comment/build_comments/${comment_id}/${article_id}`,{method:"post"});
                 if(result.ok)
                 {
                     replies_count = result.headers.get("replies-count");

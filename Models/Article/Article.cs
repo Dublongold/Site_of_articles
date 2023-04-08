@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dublongold_site.Models
 {
-    public class Article : IValidatableObject, ICan_like_and_dislike
+    public class Article : IValidatableObject, ICan_like_and_dislike, ISort_object
     {
         public int Id { get; set; }
         public string Theme { get; set; } = null!;
@@ -11,6 +11,7 @@ namespace Dublongold_site.Models
         public string Content { get; set; } = null!;
         public string Tags { get; set; } = "";
         public string Title_image { get; set; } = "/Default_article_photo.png";
+        public DateTime Created { get; init; } = DateTime.Now;
         /// <summary>
         /// Список пользователей, которые поставили лайк.
         /// </summary>

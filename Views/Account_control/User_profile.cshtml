@@ -69,12 +69,17 @@
                 <span id="number_of_account_dislikes">@Model.Users_who_disliked.Count</span>
             </div>
         </div>
-        <div id="change_user_photo_container">
-            <fieldset>
+        @* Зберігає поле, де користувач може змінити своє фото *@
+        @if ((User.Identity is null || User.Identity.Name is null) || User.Identity is not null && User.Identity.Name == Model.Login)
+        {
+            <div id="change_user_photo_container">
+                <fieldset>
                 <legend>Змініти фото свого профілю</legend>
+                <label for="change_user_photo_input"><button id="change_user_photo_button">Змінити</button></label>
                 <input type="file" accept="image/*" id="change_user_photo_input"/>
              </fieldset>
         </div>
+        }
     </div>
     @* Якщо користувач писав статті, то вони виведуться, якщо ні, то буде це вказано *@
     @if(Model.Articles.Count > 0)
