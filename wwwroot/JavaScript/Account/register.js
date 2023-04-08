@@ -65,7 +65,7 @@ async function validate_register_form(event) {
         if (register_user_password.value && register_user_password.value.trim().length > 0) {
             let password_value = register_user_password.value.trim();
             if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})/.test(password_value)) {
-                register_field_error_message_editor(register_user_data_error_ids.password, "Пароль має мати довжину мінімум 6 символів.");
+                register_field_error_message_editor(register_user_data_error_ids.password, "Пароль занадто легкий.");
             }
             else {
                 user_password = password_value;
@@ -163,12 +163,15 @@ function check_password(event) {
         let test_password = this_element.value;
         if (strong_password.test(test_password)) {
             this_element.style.backgroundColor = "green";
+            this_element.style.color = "white";
         }
         else if (medium_password.test(test_password)) {
             this_element.style.backgroundColor = "yellow";
+            this_element.style.color = "black";
         }
         else {
             this_element.style.backgroundColor = "red";
+            this_element.style.color = "white";
         }
     }
 }
@@ -196,5 +199,3 @@ document.addEventListener("DOMContentLoaded", function () {
         register_user_password.addEventListener("change", check_password);
     }
 });
-let strong_password = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})');
-let medium_password = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))');

@@ -23,7 +23,7 @@ open-at{
     vertical-align: bottom;
 }
 
-.container_of_body_and_find{
+#container_of_body_and_find{
     padding: 0px;
     vertical-align: top;
     display: grid;
@@ -32,7 +32,7 @@ open-at{
 #page_body{
     background-color: rgba(52,53,65);
     padding:5px;
-    overflow: hidden;
+    overflow:auto;
     min-height: 80vh;
 }
 #footer_body{

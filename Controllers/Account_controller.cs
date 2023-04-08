@@ -121,6 +121,23 @@ namespace Dublongold_site.Controllers
                 return Ok();
             }
         }
+
+        [HttpPost]
+        [Route("check/password")]
+        public IActionResult Check_user_password(string? login, string? password)
+        {
+            using (db_context)
+            {
+                if (login is null || password is null)
+                    return BadRequest();
+                else if (db_context.User_accounts.Any(u => u.Login == login && u.Password == password))
+                    return Ok();
+                else if (db_context.User_accounts.All(u => u.Login != login))
+                    return NotFound();
+                else
+                    return StatusCode(403);
+            }
+        }
         [HttpPost]
         [Route("logout")]
         [Authenticated_user_filter]
@@ -242,10 +259,14 @@ namespace Dublongold_site.Controllers
                             {
                                 user_account.Photo = user_photo;
                             }
+                            else if (request_header == "password" && user_data_1 is not null)
+                            {
+                                user_account.Password = user_data_1;
+                                Response.Headers.Add("user-password", Uri.EscapeDataString(user_data_1));
+                            }
                         }
                         db_context.User_accounts.Update(user_account);
                         db_context.SaveChanges();
-                        Response.Headers.ContentType = "text/plain; charset=utf-8";
                         return Ok();
                     }
                     else

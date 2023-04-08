@@ -8,6 +8,10 @@ body{
 button{
     color: white;
     background-color: rgba(52,53,65);
+    border-top: 2px solid rgb(84, 84, 84);
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    border-left: 2px solid rgb(84, 84, 84);
 }
 button:hover{
     border: 2px solid black;

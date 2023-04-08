@@ -5,7 +5,6 @@
     min-height: 50px;
     border: 3px solid rgb(71, 72, 85);
     border-radius: 5px;
-
 }
 
 #change_user_photo_container > fieldset{
@@ -31,7 +30,7 @@
     padding-left: 5px;
     padding-right: 5px;
 }
-.user-profile-login-and-full-name{
+.user-profile-login-and-full-name, #user_password_container{
     border-bottom: 1px solid gray;
 }
 .user-profile-photo-container{
@@ -94,4 +93,46 @@
     border-top: 1px solid gray;
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+#user_password_text{
+    margin-right: 5px;
+}
+#change_user_password_button{
+    margin-left: 5px;
+}
+.check-user-password{
+    display: grid;
+    grid-template-columns: max-content max-content;
+}
+.change-user-password{
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-template-rows: max-content max-content max-content;
+}
+.change-user-password > .error-message, .check-user-password > .error-message{
+    grid-column: span 2;
+}
+#user_password_container{
+    padding: 5px;
+}
+label[for="new_user_password"], label[for="new_user_password_confirm"], label[for="enter_user_password_input"]{
+    border-top: 2px solid rgb(33, 33, 33);
+    border-left: 2px solid rgb(33, 33, 33);
+    border-right: 2px solid rgb(118, 118, 118);
+    border-bottom: 2px solid rgb(118, 118, 118);
+    padding-right: 5px;
+    padding-left: 5px;
+}
+#check_entered_by_user_password_buttons, #change_user_password_buttons{
+    grid-column: 2;
+    margin-left: auto;
+    margin-top: 5px;
+    width: 100%;
+}
+#enter_user_password_submit, #change_user_password_submit{
+    float:left;
+}
+#cancel_enter_user_password, #cancel_change_user_password{
+    float:right;
 }

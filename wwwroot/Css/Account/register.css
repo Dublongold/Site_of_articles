@@ -1,16 +1,20 @@
 #register_form{
     position: relative;
     width:max-content;
-    
 }
 #register_form > div{
     display:grid;
     grid-template-columns: max-content max-content auto;
-    column-gap: 5px;
 }
-
 #register_form > div > label{
     font-size: large;
+    border-top: 2px solid rgb(33, 33, 33);
+    border-left: 2px solid rgb(33, 33, 33);
+    border-right: 2px solid rgb(118, 118, 118);
+    border-bottom: 2px solid rgb(118, 118, 118);
+    background-color: rgb(62, 63, 75);
+    padding-right: 5px;
+    padding-left: 5px;
 }
 #submit_register_user_container{
     padding-top: 5px;
@@ -24,10 +28,26 @@
     color: rgb(255, 23, 23);
     white-space: break-spaces;
     font-size: large;
+    margin-left: 5px;
 }
 
 #register_user_data_container{
     grid-row: span 6;
     display: grid;
     grid-template-columns: max-content max-content;
+}
+#recomendations_text{
+    margin-top: 5px;
+    font-weight: bolder;
+    width: fit-content;
+    border-bottom: 2px solid white;
+}
+#recomendations_container{
+    margin-top: 15px;
+    min-width: 300px;
+    padding-right: 5px;
+    width:80%;
+    background-color: rgb(62, 63, 75);
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 10px;
 }

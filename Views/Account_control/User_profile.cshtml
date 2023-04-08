@@ -15,7 +15,8 @@
                     "Account/account_reaction_controller_script.js",
                     "Account/edit_user_account_full_name.js",
                     "Account/edit_user_account_about.js",
-                    "Account/edit_user_account_photo_and_initialization.js"
+                    "Account/edit_user_account_photo_and_initialization.js",
+                    "Account/change_user_account_password.js"
         };
         js_files.AddRange(js_file_paths);
     }
@@ -37,6 +38,11 @@
             @* Логін *@
             <p id="user_login"><a href="/account/profile/@Model.Login">@@@Model.Login</a></p>
             </div>
+            @* Пароль користувача. Задана кількість зірочок навмисна, щоб не можна було вгадати пароль по їхній кількості. *@
+            @if(User.Identity is not null && User.Identity.Name == Model.Login)
+            {
+                <div id="user_password_container"><span id = "user_password_text">Пароль:</span><span id="user_password">************</span><button id="change_user_password_button">Змінити</button></div>
+            }
             @* Дата створення *@
             <p id="user_created_date">Створений: @Model.Created</p>
             @* Про користувача *@
