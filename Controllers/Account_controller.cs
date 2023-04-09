@@ -162,21 +162,24 @@ namespace Dublongold_site.Controllers
                 User_account? user_account = await db_context.User_accounts.FirstOrDefaultAsync(u => u.Login == user_login);
                 if (user_account is not null)
                 {
-                    await db_context.Entry(user_account).Collection(u => u.Articles).LoadAsync();
-                    await db_context.Entry(user_account).Collection(u => u.Users_who_liked).LoadAsync();
-                    await db_context.Entry(user_account).Collection(u => u.Users_who_disliked).LoadAsync();
-                    foreach (Article article in user_account.Articles)
+                    user_account = await db_context.User_accounts.Where(u => u.Id == user_account.Id)
+                        .Include(u => u.Articles).Include(u => u.Users_who_liked)
+                        .Include(u => u.Users_who_disliked).FirstAsync();
+                    for (int i = 0; i < user_account.Articles.Count; i++)
                     {
-                        await db_context.Entry(article).Collection(art => art.Authors).LoadAsync();
-                        await db_context.Entry(article).Collection(art => art.Users_who_liked).LoadAsync();
-                        await db_context.Entry(article).Collection(art => art.Users_who_disliked).LoadAsync();
-                        await db_context.Entry(article).Collection(art => art.Users_who_have_read).LoadAsync();
-                        await db_context.Entry(article).Collection(art => art.Comments).LoadAsync();
+
+                        user_account.Articles[i] = await db_context.Articles.Where(art => art.Id == user_account.Articles[i].Id)
+                            .Include(art => art.Authors).Include(u => u.Users_who_liked)
+                            .Include(art => art.Users_who_disliked).Include(art => art.Users_who_have_read)
+                            .Include(art => art.Comments).FirstAsync();
                     }
                     return View("User_profile", model: user_account);
                 }
+                else
+                {
+                    return NotFound();
+                }
             }
-            return BadRequest("Not implement");
         }
 
         [HttpGet]
@@ -190,14 +193,16 @@ namespace Dublongold_site.Controllers
 
                 if (user_account is not null)
                 {
-                    return View(await db_context.Articles.Where(art => art.Authors.Contains(user_account))
-                        .Include(art => art.Authors)
-                        .Include(art => art.Users_who_liked)
-                        .Include(art => art.Users_who_disliked)
-                        .Include(art => art.Users_who_have_read)
-                        .Include(art => art.Comments)
-                        .ToListAsync()
-                        );
+                    string? sort_by = Request.Headers["sort-by"];
+
+                    IEnumerable<Article> articles_sequence = Sort_sequence_by.Sort_article_by(db_context.Articles, sort_by).Take(11);
+                    await Helper_for_work_with_articles.Load_sequence_data(db_context, articles_sequence);
+                    List<Article> articles = articles_sequence.ToList();
+
+                    if(articles.Count > 10)
+                        Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
+
+                    return View(articles.Take(10));
                 }
                 else
                 {

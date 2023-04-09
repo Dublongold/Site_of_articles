@@ -1,4 +1,4 @@
-function open_article(event: PointerEvent, article_id: string)
+function open_article(event: Event, article_id: string)
 {
     let this_element = event.currentTarget as HTMLButtonElement;
     if(this_element)
@@ -8,7 +8,7 @@ function open_article(event: PointerEvent, article_id: string)
     }
 }
 
-function edit_article(event: PointerEvent, article_id: string)
+function edit_article(event: Event, article_id: string)
 {
     let this_element = event.currentTarget as HTMLButtonElement;
     if(this_element)
@@ -18,7 +18,7 @@ function edit_article(event: PointerEvent, article_id: string)
     }
 }
 
-function delete_article(event: PointerEvent, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
+function delete_article(event: Event, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
 {
     let this_element = event.target as HTMLButtonElement;
     if(this_element)
@@ -31,14 +31,14 @@ function delete_article(event: PointerEvent, article_id: string, event_for_remov
     }
 }
 
-function not_sure_delete_article(event: PointerEvent, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
+function not_sure_delete_article(event: Event, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
 {
     let this_element = event.target as HTMLButtonElement;
     if(this_element)
     {
         this_element.textContent = "Видалити";
         this_element.removeEventListener("click", event_for_remove);
-        let event_for_pass = function(event: PointerEvent) {delete_article(event, article_id, event_for_pass)} as EventListenerOrEventListenerObject;
+        let event_for_pass = function(event: Event) {delete_article(event, article_id, event_for_pass)};
         this_element.addEventListener("click", event_for_pass);
     }
 }
@@ -57,14 +57,14 @@ async function sure_delete_article(article_id: string)
     }
 }
 
-function actions_with_article(event: PointerEvent, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
+function actions_with_article(event: Event, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
 {
     let this_element = event.currentTarget as HTMLButtonElement;
     if(this_element)
     {
         this_element.textContent = "Скасувати";
         this_element.removeEventListener("click", event_for_remove);
-        let event_for_pass = function (event:PointerEvent) {cancel_actions_with_article(event, article_id, event_for_pass)} as EventListenerOrEventListenerObject;
+        let event_for_pass = function (event:Event) {cancel_actions_with_article(event, article_id, event_for_pass)};
         this_element.addEventListener("click", event_for_pass);
         let array_of_parameters = [{c:"article-edit-button", f:edit_article, t:"Редагувати"}, {c:"article-delete-button", f:delete_article, t:"Видалити"}] as const;
         for(let parameters_of_button of array_of_parameters)
@@ -74,11 +74,11 @@ function actions_with_article(event: PointerEvent, article_id: string, event_for
             let event_for_pass:any;
             if(parameters_of_button.f == edit_article)
             {
-                event_for_pass = function(event:PointerEvent) {(parameters_of_button.f as typeof edit_article)(event, article_id)};
+                event_for_pass = function(event:Event) {(parameters_of_button.f as typeof edit_article)(event, article_id)};
             }
             else
             {
-                event_for_pass = function(event:PointerEvent) {parameters_of_button.f(event, article_id, event_for_pass)};
+                event_for_pass = function(event:Event) {parameters_of_button.f(event, article_id, event_for_pass)};
             }
             new_button.addEventListener("click", event_for_pass);
             new_button.innerText = parameters_of_button.t;
@@ -90,7 +90,7 @@ function actions_with_article(event: PointerEvent, article_id: string, event_for
     }
 }
 
-function cancel_actions_with_article(event: PointerEvent, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
+function cancel_actions_with_article(event: Event, article_id: string, event_for_remove: EventListenerOrEventListenerObject)
 {
     let this_element = event.currentTarget as HTMLButtonElement;
     for(let i = 1; i < 3; i++)
@@ -103,7 +103,7 @@ function cancel_actions_with_article(event: PointerEvent, article_id: string, ev
     }
     this_element.textContent = "Дії";
     this_element.removeEventListener("click", event_for_remove);
-    let event_for_pass = function (event: PointerEvent) {actions_with_article(event, article_id, event_for_pass)} as EventListenerOrEventListenerObject;
+    let event_for_pass = function (event: Event) {actions_with_article(event, article_id, event_for_pass)} as EventListenerOrEventListenerObject;
     this_element.addEventListener("click", event_for_pass);
 }
 
@@ -120,10 +120,10 @@ document.addEventListener("DOMContentLoaded", function()
             if(article_id)
             {
                 open_button.removeAttribute("article_id");
-                open_button.addEventListener("click", function(event: PointerEvent)
+                open_button.addEventListener("click", function(event: Event)
                 {
                     open_article(event, article_id);
-                } as EventListenerOrEventListenerObject);
+                });
             }
         }
     }
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function()
                 if(article_id)
                 {
                     actions_button.removeAttribute("article_id");
-                    let event_for_pass = function(event: PointerEvent){actions_with_article(event, article_id, event_for_pass);} as EventListenerOrEventListenerObject;
+                    let event_for_pass = function(event: Event){actions_with_article(event, article_id, event_for_pass);};
                     actions_button.addEventListener("click", event_for_pass);
                 }
             }

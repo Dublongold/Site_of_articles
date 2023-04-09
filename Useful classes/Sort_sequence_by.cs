@@ -9,7 +9,7 @@ namespace Dublongold_site.Useful_classes
             return sort_by switch
             {
                 "date" => list_for_sort.OrderBy(li => li.Created),
-                "rating" => list_for_sort.OrderBy(li => li.Users_who_liked.Count - li.Users_who_disliked.Count).ThenBy(li => li.Created),
+                "rating" => list_for_sort.OrderBy(li => li.Users_who_liked.Count - li.Users_who_disliked.Count()).ThenBy(li => li.Created),
                 _ => list_for_sort.OrderBy(li => li.Created)
             };
         }

@@ -22,6 +22,8 @@ namespace Dublongold_site
             builder.Services.AddDbContext<Database_context>(options =>
             {
                 options.UseMySql(connection_string, new MySqlServerVersion(new Version(8, 0, 32)));
+                options.UseLoggerFactory(LoggerFactory.Create(
+                    configure => configure.AddProvider(new FileLoggerProvider(Directory.GetCurrentDirectory() + "/Db_log.txt"))));
             });
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
@@ -45,5 +47,58 @@ namespace Dublongold_site
 
             app.Run();
         }
+    }
+    public class FileLogger : ILogger, IDisposable
+    {
+        string filePath;
+        static object _lock = new object();
+        public FileLogger(string path)
+        {
+            filePath = path;
+        }
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        {
+            return this;
+        }
+
+        public void Dispose() 
+        {
+            using(FileStream file = new((Directory.GetCurrentDirectory() + "/Db_log.txt"), FileMode.Append))
+            {
+                using(StreamWriter write = new(file))
+                {
+                    write.WriteLine("\nEnd actions with database.");
+                }
+            }
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            //return logLevel == LogLevel.Trace;
+            return true;
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId,
+                    TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            lock (_lock)
+            {
+                File.AppendAllText(filePath, formatter(state, exception) + Environment.NewLine);
+            }
+        }
+    }
+    public class FileLoggerProvider : ILoggerProvider
+    {
+        string path;
+        public FileLoggerProvider(string path)
+        {
+            this.path = path;
+        }
+        public ILogger CreateLogger(string categoryName)
+        {
+            return new FileLogger(path);
+        }
+
+        public void Dispose() { }
     }
 }

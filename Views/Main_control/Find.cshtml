@@ -5,13 +5,14 @@
     string? find_text = ViewData["Find_text"]?.ToString();
     if (find_text is null) 
         find_text = "";
+    TempData["body-head-text"] = $"Результат пошуку за текстом \"{find_text}\":";
 }
-<h3 id="body_head_text">Результат пошуку за текстом "@find_text":</h3>
 @if(Model.Count > 0)
 {
     @await Html.PartialAsync("Render_articles", Model)
 }
 else
 {
+    <h3 id="body_head_text">Результат пошуку за текстом "@find_text":</h3>
     <p>Вибачте, але... не було знайден жодної статті, яка б відповідала вашому запиту.</p>
 }

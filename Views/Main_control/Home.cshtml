@@ -2,7 +2,6 @@
 @model List<Article>?
 @{
     ViewData["Title"] = "Home";
+    TempData["body-head-text"] = "Найбільш популярні статті:";
 }
-
-<h3 id="body_head_text">Найбільш популярні статті:</h3>
 @await Html.PartialAsync("Render_articles", Model)

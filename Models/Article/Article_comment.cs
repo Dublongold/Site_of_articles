@@ -19,13 +19,7 @@ namespace Dublongold_site.Models
         public int? Reply_to_comment_id { get; set; }
         public int? Reply_to_comment_id_of_article { get; set; }
         public Article_comment? Reply_to_comment { get; set; }
-        /// <summary>
-        /// Список пользователей, которые поставили лайк.
-        /// </summary>
         public List<User_account> Users_who_liked { get; set; } = new();
-        /// <summary>
-        /// Список пользователей, которые поставили дислайк.
-        /// </summary>
         public List<User_account> Users_who_disliked { get; set; } = new();
     }
 }

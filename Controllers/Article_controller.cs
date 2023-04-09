@@ -62,7 +62,7 @@ namespace Dublongold_site.Controllers
                 List<ValidationResult> validation_results = new();
                 if (Validator.TryValidateObject(article, validation_context, validation_results, true))
                 {
-                    List<string> errors = await Set_some_properties_for_article.Set_async(article, db_context, User, co_authors);
+                    List<string> errors = await Helper_for_work_with_articles.Set_async(article, db_context, User, co_authors);
                     if (errors.Count == 0)
                     {
 
@@ -94,7 +94,7 @@ namespace Dublongold_site.Controllers
                 List<ValidationResult> validation_results = new();
                 if (Validator.TryValidateObject(article, validation_context, validation_results, true))
                 {
-                    List<string> errors = await Set_some_properties_for_article.Set_async(article, db_context, User, co_authors);
+                    List<string> errors = await Helper_for_work_with_articles.Set_async(article, db_context, User, co_authors);
                     if (errors.Count == 0)
                     {
                         TempData["without_comments"] = true;
@@ -139,7 +139,7 @@ namespace Dublongold_site.Controllers
                     List<ValidationResult> validation_results = new();
                     if (Validator.TryValidateObject(article, validation_context, validation_results, true))
                     {
-                        List<string> errors = Set_some_properties_for_article.Set(article, db_context, User, co_authors);
+                        List<string> errors = Helper_for_work_with_articles.Set(article, db_context, User, co_authors);
                         if (errors.Count == 0)
                         {
                             Article? old_article = db_context.Articles.FirstOrDefault(art => art.Id == id);
@@ -207,11 +207,48 @@ namespace Dublongold_site.Controllers
                 if (article is not null && user_account is not null && article.Users_who_have_read.All(u => u.Login != user_account.Login))
                 {
                     article.Users_who_have_read.Add(user_account);
+                    article.Users_who_have_read_count = article.Users_who_have_read.Count;
                     db_context.Articles.Update(article);
                     await db_context.SaveChangesAsync();
                     return Ok(article.Users_who_have_read.Count);
                 }
                 return NotFound();
+            }
+        }
+        [HttpGet]
+        [Route("load_more/{where_load}/{article_id}/{name_or_text_of_article?}")]
+        public async Task<IActionResult> Load_more_articles(string article_id, string where_load, string? name_or_text_of_article)
+        {
+            using (db_context)
+            {
+                string? sort_by = Request.Headers["sort-by"];
+                if (int.TryParse(article_id, out int last_article_id))
+                {
+                    Article? article = await db_context.Articles.FirstOrDefaultAsync(art => art.Id == last_article_id);
+                    if (article is not null)
+                    {
+                        where_load = where_load.ToLower();
+                        if (where_load == "home" || where_load == "user" || where_load == "profile")
+                        {
+                            List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.AsEnumerable().SkipWhile(art => art.Id != article.Id), sort_by);
+                            if (articles.Count > 10)
+                                Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
+                            return View(articles);
+                        }
+                        else
+                        {
+
+                            List<Article> articles = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by);
+                            if (articles.Count > 10)
+                                Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
+                            return View(articles);
+                        }
+                    }
+                    else
+                        return NotFound();
+                }
+                else
+                    return BadRequest("not integer");
             }
         }
         [HttpPost]

@@ -20,10 +20,11 @@ namespace Dublongold_site.Controllers
         }
         [HttpGet]
         [Route("load_more")]
-        public async Task<IActionResult> Load_more_comments(int comment_id, int article_id, string? sort_by)
+        public async Task<IActionResult> Load_more_comments(int comment_id, int article_id)
         {
             using (db_context)
             {
+                string? sort_by = Request.Headers["sort-by"];
                 if (comment_id > 0)
                 {
                     Article_comment? last_comment = await db_context.Article_comments

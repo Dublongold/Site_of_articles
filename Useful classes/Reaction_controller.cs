@@ -24,7 +24,7 @@ namespace Dublongold_site.Useful_classes
                     if (can_like_and_dislike_object.Users_who_disliked.Contains(user_who_react))
                     {
                         can_like_and_dislike_object.Users_who_disliked.Remove(user_who_react);
-                        http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count.ToString());
+                        http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count().ToString());
                         return "c";
                     }
                     // Add like.

@@ -37,7 +37,7 @@
             <hr />
             <p>Теги: @(string.IsNullOrEmpty(Model.Tags)?"Немає...":Model.Tags)</p>
             <div class="article-content-container">@Html.Raw(Model.Content)</div>
-            <span id = "user_who_have_read_count" have_read = "@(you_have_read_too != ""?"true":"false")">Прочитало: @Model.Users_who_have_read.Count@you_have_read_too</span>
+            <span id = "user_who_have_read_count" have_read = "@(you_have_read_too != ""?"true":"false")">Прочитало: @Model.Users_who_have_read_count@you_have_read_too</span>
             <br />
             <div class="like-dislike-author-container">
                 <div>
@@ -47,7 +47,7 @@
                     <span> | </span>
                     <button type = "button" id = "dislike_article"
                         style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">Не подобається</button>
-                    : <span id = "dislike_count_of_article">@Model.Users_who_disliked.Count</span>
+                    : <span id = "dislike_count_of_article">@Model.Users_who_disliked.Count()</span>
                 </div>
                 <div class="author-element">
                     @if(Model.Authors.Count > 1)

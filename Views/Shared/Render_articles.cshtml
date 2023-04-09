@@ -11,13 +11,27 @@
     }
     if(ViewData["js_files"] is List<string> js_files)
     {
-        js_files.Add("Article/actions_with_article_buttons_script.js");
+        string[] js_files_path = {"Article/actions_with_article_buttons_script.js",
+                                "Article/load_more_articles.js",
+                                "Article/sort_articles_by.js"};
+        js_files.AddRange(js_files_path);
     }
     using(Database_context db_context = new())
     {
         is_user_article = await Checking_authentic_user_or_not.Check(User, db_context);
     }
 }
+@if (TempData["render-articles-in-user-profile"]?.ToString() != "true")
+{<div id="body_head_text">
+    <span id="body_head_text_element">@TempData["body-head-text"]</span>
+    <div id="sort_articles_by_container">
+        <span id="sort_articles_by_text">Впорядкувати:</span>
+        <select id="sort_articles_by">
+            <option value="date" selected)>За датою створення</option>
+            <option value="rating")>За рейтингом</option> 
+        </select>
+    </div>
+</div>}
 <div class = "preview-articles-container">
     @if (Model is not null && Model.Count > 0)
     {
@@ -39,13 +53,13 @@
                     <button class = "article-open-button" article_id = "@article.Id">Відкрити</button>
                     <br />
                     <div class = "other-info-about-article-container">
-                        Прочитало: @article.Users_who_have_read.Count
+                        Прочитало: @article.Users_who_have_read_count
                         <br/>
                         Коментарів: @article.Comments.Count
                         <br/>
-                        Сподобалось: @article.Users_who_liked.Count, Не сподобалось: @article.Users_who_disliked.Count
+                        Сподобалось: @article.Users_who_liked.Count, Не сподобалось: @article.Users_who_disliked.Count()
                         <span style="float: right;">
-                            Автор@(article.Authors.Count > 1 ? "и" : ""): @Html.Raw(article.Authors.Count > 0 ? article.Authors.Select(x => "<a href = \"/account/profile/" + x.Login + "\">@" + x.Login + "</a>").Aggregate((u1, u2) => u1 + ", " + u2) : "Ніхто?").
+                            Автор@(article.Authors.Count > 1 ? "и" : ""): @Html.Raw(article.Authors.Count > 0 ? article.Authors.Select(x => "<a href = \"/account/profile/" + x.Login + "\">@" + x.Login + "</a>").Aggregate((u1, u2) => u1 + ", " + u2) : "Ніхто?")
                         </span>
                     </div>
                 </div>

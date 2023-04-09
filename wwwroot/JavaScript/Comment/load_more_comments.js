@@ -27,7 +27,6 @@ async function load_more_comments(event) {
                 this_element.insertAdjacentHTML("beforebegin", await load_request.text());
                 last_comment_id = load_request.headers.get("last-comment-id");
                 if (last_comment_id) {
-                    console.log("Try change last_comment_id: " + last_comment_id);
                     this_element.setAttribute("last_comment_id", last_comment_id);
                 }
                 else
@@ -35,6 +34,9 @@ async function load_more_comments(event) {
             }
             else
                 console.log("bad");
+        }
+        else {
+            console.log("Або last_comment_id немає, або article_id немає.");
         }
     }
 }

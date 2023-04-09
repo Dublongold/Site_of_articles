@@ -1,10 +1,12 @@
 ﻿@using Dublongold_site.Models
+@using Dublongold_site.Useful_classes
 
 @model User_account
 
 @{
     ViewData["Title"] = Model.Login;
     string[] background_reaction_color = { "rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)" };
+
     if(ViewData["css_files"] is List<string> css_files)
     {
         css_files.Add("Account/user_profile.css");
@@ -20,6 +22,8 @@
         };
         js_files.AddRange(js_file_paths);
     }
+    if(Model.Articles.Count > 0)
+        TempData["render-articles-in-user-profile"] = "true";
 }
 
 <div id = "user_profile_container">
@@ -38,6 +42,8 @@
             @* Логін *@
             <p id="user_login"><a href="/account/profile/@Model.Login">@@@Model.Login</a></p>
             </div>
+            @* Пошта *@
+            <div id="user_email_container"><span id="user_email_text">Пошта:</span><span id = "user_email">@Model.Email</span></div>
             @* Пароль користувача. Задана кількість зірочок навмисна, щоб не можна було вгадати пароль по їхній кількості. *@
             @if(User.Identity is not null && User.Identity.Name == Model.Login)
             {
@@ -78,7 +84,7 @@
             </div>
         </div>
         @* Зберігає поле, де користувач може змінити своє фото *@
-        @if ((User.Identity is null || User.Identity.Name is null) || User.Identity is not null && User.Identity.Name == Model.Login)
+        @if (User.Identity is not null && User.Identity.Name == Model.Login)
         {
             <div id="change_user_photo_container">
                 <fieldset>
@@ -93,7 +99,7 @@
     @if(Model.Articles.Count > 0)
     {
         @* Якщо більше, чем 5 статтей, то виводимо лише 5 найбільш популярних, інакше виводимо всі *@
-        <fieldset> 
+        <fieldset>
         @if(Model.Articles.Count > 5)
         {
             <legend class = "title-of-user-articles">5 найбільш популярних статтей, написаних цим користувачем:</legend>

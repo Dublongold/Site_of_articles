@@ -116,7 +116,7 @@
 #user_password_container{
     padding: 5px;
 }
-label[for="new_user_password"], label[for="new_user_password_confirm"], label[for="enter_user_password_input"]{
+label[for="new_user_password"], label[for="new_user_password_confirm"], label[for="enter_user_password_input"], #user_password, #user_email{
     border-top: 2px solid rgb(33, 33, 33);
     border-left: 2px solid rgb(33, 33, 33);
     border-right: 2px solid rgb(118, 118, 118);
@@ -135,4 +135,12 @@ label[for="new_user_password"], label[for="new_user_password_confirm"], label[fo
 }
 #cancel_enter_user_password, #cancel_change_user_password{
     float:right;
+}
+#user_email_text{
+    margin-right: 5px;
+}
+#user_email_container{
+    border-bottom: 1px solid gray;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
