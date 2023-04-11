@@ -7,5 +7,7 @@ namespace Dublongold_site.Generated_regexs
 
         [GeneratedRegex("<img\\s.*?>", RegexOptions.IgnoreCase)]
         public static partial Regex Find_img();
+        [GeneratedRegex("[^\\wа-яА-ЯіїІЇ]+", RegexOptions.IgnoreCase)]
+        public static partial Regex Find_request_format();
     }
 }

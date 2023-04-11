@@ -24,7 +24,7 @@
     List<Article_comment>? comments = null;
     if(Model is not null)
     {
-        comments = Sort_sequence_by.Sort_comment_by(Model.Comments, ViewData["sort-by"]?.ToString()).Take(11).ToList();
+        comments = Sort_sequence_by.Sort_by(new Database_context(), Model.Comments, ViewData["sort-by"]?.ToString()).Take(11).ToList();
         if (comments.Count > 10)
             ViewData["last-comment-id"] = comments.Last().Id;
     }

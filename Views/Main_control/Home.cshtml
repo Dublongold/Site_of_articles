@@ -1,7 +1,9 @@
 ﻿@using Dublongold_site.Models
 @model List<Article>?
 @{
-    ViewData["Title"] = "Home";
-    TempData["body-head-text"] = "Найбільш популярні статті:";
+    if(ViewContext.HttpContext.Request.Headers["is-sort-articles-action"].ToString() is string is_sort_articles_action && is_sort_articles_action.ToLower() == "true")
+            Layout = null;
+    ViewData["Title"] = "Головна";
+    TempData["body-head-text"] = "Статті, які написали користувачі на цьому сайті:";
 }
 @await Html.PartialAsync("Render_articles", Model)

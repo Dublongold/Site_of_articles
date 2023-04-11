@@ -107,7 +107,7 @@ function cancel_actions_with_article(event: Event, article_id: string, event_for
     this_element.addEventListener("click", event_for_pass);
 }
 
-document.addEventListener("DOMContentLoaded", function()
+function add_event_listeners_for_actions_with_article_buttons()
 {
     let article_open_buttons = document.querySelectorAll(".article-open-button");
     let article_actions_buttons = document.querySelectorAll(".article-actions-button");
@@ -144,4 +144,9 @@ document.addEventListener("DOMContentLoaded", function()
             }
         }
     }
+}
+
+document.addEventListener("DOMContentLoaded", function()
+{
+    add_event_listeners_for_actions_with_article_buttons();
 });

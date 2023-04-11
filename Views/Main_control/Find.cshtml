@@ -1,6 +1,8 @@
 ﻿@using Dublongold_site.Models
 @model List<Article>
 @{
+    if(ViewContext.HttpContext.Request.Headers["is-sort-articles-action"].ToString() is string is_sort_articles_action && is_sort_articles_action.ToLower() == "true")
+            Layout = null;
     ViewData["Title"] = "Пошук";
     string? find_text = ViewData["Find_text"]?.ToString();
     if (find_text is null) 
@@ -13,6 +15,9 @@
 }
 else
 {
-    <h3 id="body_head_text">Результат пошуку за текстом "@find_text":</h3>
+    if ((ViewContext.HttpContext.Request.Headers["is-sort-articles-action"].ToString() is string is_sort_articles_action_too && is_sort_articles_action_too.ToLower() == "true") == false)
+    {
+        <h3 id="body_head_text">Результат пошуку за текстом "@find_text":</h3>
+    }
     <p>Вибачте, але... не було знайден жодної статті, яка б відповідала вашому запиту.</p>
 }

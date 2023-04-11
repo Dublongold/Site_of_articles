@@ -222,15 +222,16 @@ namespace Dublongold_site.Controllers
             using (db_context)
             {
                 string? sort_by = Request.Headers["sort-by"];
+
                 if (int.TryParse(article_id, out int last_article_id))
                 {
                     Article? article = await db_context.Articles.FirstOrDefaultAsync(art => art.Id == last_article_id);
                     if (article is not null)
                     {
                         where_load = where_load.ToLower();
-                        if (where_load == "home" || where_load == "user" || where_load == "profile")
+                        if (where_load == "home" || where_load == "user" || where_load == "profile" || where_load == "")
                         {
-                            List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.AsEnumerable().SkipWhile(art => art.Id != article.Id), sort_by);
+                            List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by, last_article_id);
                             if (articles.Count > 10)
                                 Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
                             return View(articles);
@@ -238,7 +239,7 @@ namespace Dublongold_site.Controllers
                         else
                         {
 
-                            List<Article> articles = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by);
+                            List<Article> articles = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by, last_article_id);
                             if (articles.Count > 10)
                                 Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
                             return View(articles);
@@ -250,6 +251,24 @@ namespace Dublongold_site.Controllers
                 else
                     return BadRequest("not integer");
             }
+        }
+        [HttpGet]
+        [Route("sort_by/{where_sort?}/{name_or_text_of_article?}")]
+        public IActionResult Sort_articles_by(string? where_sort, string? name_or_text_of_article)
+        {
+            using (db_context)
+            {
+                if(where_sort is not null)
+                    where_sort = Uri.UnescapeDataString(where_sort);
+                Console.WriteLine(where_sort);
+                if (string.IsNullOrEmpty(where_sort) || where_sort == "home")
+                    return RedirectToAction("Home", "Main_control");
+                else if (where_sort.ToLower() == "account/articles")
+                    return RedirectToAction("Articles", "Account_control");
+                else if (where_sort.ToLower() == "find")
+                    return RedirectToAction("Find", "Main_control", new{name_or_text_of_article});
+            }
+            return BadRequest();
         }
         [HttpPost]
         [Route("reaction/{article_id:int}")]

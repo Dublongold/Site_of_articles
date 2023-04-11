@@ -45,7 +45,7 @@ namespace Dublongold_site.Controllers
                                 await db_context.Entry(reply_comment).Collection(c => c.Replying_comments).LoadAsync();
                                 await db_context.Entry(reply_comment).Reference(c => c.Author).LoadAsync();
                             }
-                            List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(main_comment.Replying_comments, sort_by)
+                            List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, main_comment.Replying_comments, sort_by)
                                 .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id).Take(11).ToList();
                             if (comments.Count > 10)
                                 Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
@@ -63,14 +63,13 @@ namespace Dublongold_site.Controllers
                                     await db_context.Entry(temp_comment).Collection(c => c.Users_who_disliked).LoadAsync();
                                 }
 
-                                List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(article.Comments, sort_by)
+                                List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, article.Comments, sort_by)
                                     .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id || c.Reply_to_comment != null).Take(11).ToList();
                                 foreach (Article_comment temp_comment in comments)
                                 {
                                     await db_context.Entry(temp_comment).Collection(c => c.Replying_comments).LoadAsync();
                                     await db_context.Entry(temp_comment).Reference(c => c.Author).LoadAsync();
                                 }
-                                Console.WriteLine(comments.Select(c => c.Id.ToString()).Aggregate((c1, c2) => c1 + ", " + c2));
                                 if (comments.Count > 10)
                                     Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
                                 return View("/Views/Comments/Load_comments.cshtml", comments.Take(10).ToList());
@@ -212,7 +211,7 @@ namespace Dublongold_site.Controllers
                     ViewData["Main_comment"] = comment;
                     HttpContext.Response.Headers.Add("replies-count", comment.Replying_comments.Count.ToString());
 
-                    List<Article_comment> comments = Sort_sequence_by.Sort_comment_by(comment.Replying_comments, sort_by).Take(11).ToList();
+                    List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, comment.Replying_comments, sort_by).Take(11).ToList();
                     if (comments.Count > 10)
                         ViewData["last-comment-id"] = comments.Last().Id;
                     return View("/Views/Comments/Comments_builder.cshtml", comments.Take(10).ToList());

@@ -1,7 +1,10 @@
 ﻿@using Dublongold_site.Models
 @model List<Article>?
 @{
-    ViewData["Title"] = "Your articles";
+    if(ViewContext.HttpContext.Request.Headers["is-sort-articles-action"].ToString() is string is_sort_articles_action)
+        if (is_sort_articles_action.ToLower() == "true")
+            Layout = null;
+    ViewData["Title"] = "Ваші статті";
     ViewData["user_articles"] = true;
     TempData["body-head-text"] = "Ваші статті:";
 }

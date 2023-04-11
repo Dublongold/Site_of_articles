@@ -82,7 +82,7 @@ function cancel_actions_with_article(event, article_id, event_for_remove) {
     let event_for_pass = function (event) { actions_with_article(event, article_id, event_for_pass); };
     this_element.addEventListener("click", event_for_pass);
 }
-document.addEventListener("DOMContentLoaded", function () {
+function add_event_listeners_for_actions_with_article_buttons() {
     let article_open_buttons = document.querySelectorAll(".article-open-button");
     let article_actions_buttons = document.querySelectorAll(".article-actions-button");
     if (article_open_buttons.length > 0) {
@@ -108,4 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }
+}
+document.addEventListener("DOMContentLoaded", function () {
+    add_event_listeners_for_actions_with_article_buttons();
 });

@@ -9,10 +9,17 @@ async function load_more_articles(event: Event)
         let this_element = event.currentTarget as HTMLButtonElement;
         if(this_element)
         {
+            this_element.disabled = true;
             let last_article_id = this_element.getAttribute("last_article_id");
+            let sort_articles_by_element = document.getElementById("sort_articles_by") as HTMLSelectElement;
             if(last_article_id)
             {
-                const load_request = await fetch(`/article/load_more/home/${last_article_id}`);
+                let where_load = window.location.pathname.substring(1);
+                if(where_load === "")
+                {
+                    where_load = "home";
+                }
+                const load_request = await fetch(`/article/load_more/${where_load}/${last_article_id}`, {headers:{"sort-by":sort_articles_by_element.value}});
                 if(load_request.ok)
                 {
                     this_element.insertAdjacentHTML("beforebegin", await load_request.text());
@@ -27,6 +34,7 @@ async function load_more_articles(event: Event)
             }
             else
                 console.log("last_article_id not found.");
+            this_element.disabled = false;
         }
         else
             console.log("this element not found.");
@@ -35,11 +43,15 @@ async function load_more_articles(event: Event)
         console.log("event not found.");
     error_message_editor(source, error_message, where_append, error_message_id);
 }
-
-document.addEventListener("DOMContentLoaded", function(){
+function add_event_listener_for_load_more_acticles()
+{
     let load_more_articles_button = document.getElementById("load_more_articles");
     if(load_more_articles_button)
     {
         load_more_articles_button.addEventListener("click", load_more_articles)
     }
-})
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    add_event_listener_for_load_more_acticles();
+});

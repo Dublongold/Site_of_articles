@@ -18,7 +18,10 @@ namespace Dublongold_site
             // Призначенний для створення початкових елементів в бази даних.
             // Якщо потрібно, щоб дані зберігалися і не оновлювалися, то просто прибери його.
             Create_start_data_of_database.Create();
+            using (FileStream file = new(Directory.GetCurrentDirectory() + "/Db_log.txt", FileMode.Create))
+            {
 
+            }
             builder.Services.AddDbContext<Database_context>(options =>
             {
                 options.UseMySql(connection_string, new MySqlServerVersion(new Version(8, 0, 32)));
@@ -63,13 +66,9 @@ namespace Dublongold_site
 
         public void Dispose() 
         {
-            using(FileStream file = new((Directory.GetCurrentDirectory() + "/Db_log.txt"), FileMode.Append))
-            {
-                using(StreamWriter write = new(file))
-                {
-                    write.WriteLine("\nEnd actions with database.");
-                }
-            }
+            using FileStream file = new(Directory.GetCurrentDirectory() + "/Db_log.txt", FileMode.Append);
+            using StreamWriter write = new(file);
+            write.WriteLine("\nEnd actions with database.");
         }
 
         public bool IsEnabled(LogLevel logLevel)

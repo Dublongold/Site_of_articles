@@ -5,23 +5,28 @@
 
 @{
     bool is_user_article = false;
-    if(ViewData["css_files"] is List<string> css_files)
+    string? is_sort_articles_action = ViewContext.HttpContext.Request.Headers["is-sort-articles-action"].ToString();
+    if (is_sort_articles_action is null || is_sort_articles_action.ToLower() != "true")
     {
-        css_files.Add("Article/article_preview.css");
-    }
-    if(ViewData["js_files"] is List<string> js_files)
-    {
-        string[] js_files_path = {"Article/actions_with_article_buttons_script.js",
+        if (ViewData["css_files"] is List<string> css_files)
+        {
+            css_files.Add("Article/article_preview.css");
+        }
+        if (ViewData["js_files"] is List<string> js_files)
+        {
+            string[] js_files_path = {"Article/actions_with_article_buttons_script.js",
                                 "Article/load_more_articles.js",
                                 "Article/sort_articles_by.js"};
-        js_files.AddRange(js_files_path);
+            js_files.AddRange(js_files_path);
+        }
     }
     using(Database_context db_context = new())
     {
         is_user_article = await Checking_authentic_user_or_not.Check(User, db_context);
+
     }
 }
-@if (TempData["render-articles-in-user-profile"]?.ToString() != "true")
+@if(is_sort_articles_action is null ||  is_sort_articles_action.ToLower() != "true")
 {<div id="body_head_text">
     <span id="body_head_text_element">@TempData["body-head-text"]</span>
     <div id="sort_articles_by_container">

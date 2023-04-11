@@ -101,9 +101,14 @@ namespace Dublongold_site.Useful_classes
         /// <param name="articles_sequence">Послідовність статей.</param>
         /// <param name="sort_by">Спосіб сортування. Може бути або "date", або "rating"</param>
         /// <returns>Відсортований список статей, в якому довантажені потрібні елементи.</returns>
-        public static async Task<List<Article>> Get_article_with_load_and_sort(Database_context db_context, IEnumerable<Article> articles_sequence, string? sort_by)
+        public static async Task<List<Article>> Get_article_with_load_and_sort(Database_context db_context, IEnumerable<Article> articles_sequence, string? sort_by, int last_article_id = -1)
         {
-            articles_sequence = Sort_sequence_by.Sort_article_by(articles_sequence, sort_by).Take(11);
+            articles_sequence = Sort_sequence_by.Sort_by(db_context, articles_sequence, sort_by);
+            if (last_article_id != -1)
+            {
+                articles_sequence = articles_sequence.SkipWhile(art => art.Id != last_article_id);
+            }
+            articles_sequence = articles_sequence.Take(11);
             await Load_sequence_data(db_context, articles_sequence);
             return articles_sequence.ToList();
         }
