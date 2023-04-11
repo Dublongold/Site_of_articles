@@ -33,13 +33,10 @@ namespace Dublongold_site.Controllers
                                                 .Include(art => art.Users_who_disliked)
                                                 .Include(art => art.Users_who_have_read)
                                                 .FirstAsync();
-                foreach (Article_comment comment in article.Comments)
-                {
-                    db_context.Entry(comment).Reference(c => c.Author).Load();
-                    db_context.Entry(comment).Collection(c => c.Replying_comments).Load();
-                    db_context.Entry(comment).Collection(c => c.Users_who_liked).Load();
-                    db_context.Entry(comment).Collection(c => c.Users_who_disliked).Load();
-                }
+                article.Comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), null);
+                if (article.Comments.Count > 10)
+                    ViewData["last-comment-id"] = article.Comments.Last().Id;
+                article.Comments = article.Comments.Take(10).ToList();
                 return View(article);
             }
         }
@@ -231,10 +228,10 @@ namespace Dublongold_site.Controllers
                         where_load = where_load.ToLower();
                         if (where_load == "home" || where_load == "user" || where_load == "profile" || where_load == "")
                         {
-                            List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by, last_article_id);
+                            List<Article> articles = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by, last_article_id);
                             if (articles.Count > 10)
                                 Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
-                            return View(articles);
+                            return View(articles.Take(10).ToList());
                         }
                         else
                         {
@@ -242,7 +239,7 @@ namespace Dublongold_site.Controllers
                             List<Article> articles = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by, last_article_id);
                             if (articles.Count > 10)
                                 Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
-                            return View(articles);
+                            return View(articles.Take(10).ToList());
                         }
                     }
                     else

@@ -22,8 +22,7 @@
         };
         js_files.AddRange(js_file_paths);
     }
-    if(Model.Articles.Count > 0)
-        TempData["render-articles-in-user-profile"] = "true";
+    TempData["render-articles-in-user-profile"] = "true";
 }
 
 <div id = "user_profile_container">

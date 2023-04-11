@@ -5,8 +5,8 @@
 @model Article?
 @{
     ViewData["Title"] = Model?.Theme ?? "Стаття";
-    (ViewData["css_files"] as List<string>)?.Add("Article/read_article.css");
     string you_have_read_too = "";
+    string? sort_by = ViewContext.HttpContext.Request.Headers["sort-by"];
     string[] background_reaction_color = { "rgb(193, 23, 23)", "rgb(29, 165, 29)", "rgba(52,53,65)" };
     if(User.Identity is not null && User.Identity.IsAuthenticated && Model is not null)
     {
@@ -17,16 +17,8 @@
     }
     @if(ViewData["css_files"] is List<string> css_files)
     {
-        string[] css_files_paths = {"Comment/comment.css"};
+        string[] css_files_paths = {"Article/read_article.css", "Comment/comment.css"};
         css_files.AddRange(css_files_paths);
-    }
-
-    List<Article_comment>? comments = null;
-    if(Model is not null)
-    {
-        comments = Sort_sequence_by.Sort_by(new Database_context(), Model.Comments, ViewData["sort-by"]?.ToString()).Take(11).ToList();
-        if (comments.Count > 10)
-            ViewData["last-comment-id"] = comments.Last().Id;
     }
 }
 <div id = "article_body" article_id="@(Model?.Id ?? -1)">
@@ -86,8 +78,7 @@
                 <div id="unauthorized_cannot_write_comments_text">Тільки авторизовані користувачі можуть залишати коментарі...</div>
             }
             <hr />
-            @await Html.PartialAsync("/Views/Comments/Comments_builder.cshtml", comments?.Take(10).ToList() ?? new List<Article_comment>(0))
-
+            @await Html.PartialAsync("/Views/Comment_control/Comments_builder.cshtml", Model.Comments)
             if (ViewData["js_files"] is List<string> js_files)
             {
                 string[] src_paths = { 
@@ -97,6 +88,7 @@
                     "Comment/comment_reaction_scripts/comment_reaction.js",
                     "Comment/comment_reaction_scripts/change_comment_color_script.js",
                     "Comment/write_comment.js", 
+                    "Comment/sort_comments_by.js", 
                     "Comment/comment_edit.js",
                     "Comment/comment_delete.js",
                     "Comment/replies_controller.js",

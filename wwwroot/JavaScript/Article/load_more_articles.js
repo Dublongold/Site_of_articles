@@ -25,17 +25,17 @@ async function load_more_articles(event) {
                         this_element.remove();
                 }
                 else
-                    console.log("Bad request");
+                    error_message = "Поганий запит с кодом " + load_request.status;
             }
             else
-                console.log("last_article_id not found.");
+                error_message = "Атрибут last_article_id не знайдено.";
             this_element.disabled = false;
         }
         else
-            console.log("this element not found.");
+            error_message = "Цей елемент не знайдено.";
     }
     else
-        console.log("event not found.");
+        error_message = "Подію не знайдено.";
     error_message_editor(source, error_message, where_append, error_message_id);
 }
 function add_event_listener_for_load_more_acticles() {

@@ -76,7 +76,7 @@ namespace Dublongold_site.Useful_classes
                         Article_id = 1,
                         Author = db_context.User_accounts.First(ac => ac.Id == 2),
                         Content = "Good article!",
-                        Users_who_liked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
+                        Users_who_disliked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
                     }); ;
                 db_context.Article_comments.Add(
                     new Article_comment()
@@ -93,7 +93,7 @@ namespace Dublongold_site.Useful_classes
                         Article_id = 1,
                         Author = db_context.User_accounts.First(ac => ac.Id == 2),
                         Content = "Good article!",
-                        Users_who_disliked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
+                        Users_who_liked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
                     });
                 db_context.Article_comments.Add(
                     new Article_comment()
@@ -147,20 +147,20 @@ namespace Dublongold_site.Useful_classes
                         Reply_to_comment_id = 5,
                         Reply_to_comment_id_of_article = 1
                     });
-                for(int i = 8; i < 20; i++)
+                for(int i = 8; i < 30; i++)
                 db_context.Article_comments.Add(
                     new Article_comment()
                     {
                         Id = i,
                         Article_id = 1,
                         Author = db_context.User_accounts.First(ac => ac.Id == 2),
-                        Content = "Good article!",
+                        Content = "Good article!!",
                         Users_who_disliked = db_context.User_accounts.Where(ac => ac.Id == 1).ToList()
                     });
                 db_context.Article_comments.Add(
                     new Article_comment()
                     {
-                        Id = 20,
+                        Id = 30,
                         Article_id = 1,
                         Author = db_context.User_accounts.First(ac => ac.Id == 2),
                         Content = "Good article!!!",

@@ -19,6 +19,34 @@ namespace Dublongold_site.Controllers
             db_context = new_db_context;
         }
         [HttpGet]
+        [Route("sort_by/{article_id:int}")]
+        public async Task<IActionResult> Sort_comments_by(int article_id)
+        {
+            using (db_context)
+            {
+                string? sort_by = Request.Headers["sort-by"];
+                Article? article = await db_context.Articles.Where(art => art.Id == article_id).Include(art => art.Comments).FirstOrDefaultAsync();
+
+                if (article is not null)
+                {
+                    Console.WriteLine("Sort by: " + sort_by);
+                    List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), sort_by);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Console.WriteLine(comments[i].Id);
+                        Console.WriteLine(comments[i].Users_who_liked.Count + ":" + comments[i].Users_who_disliked.Count);
+                    }
+                    if (comments.Count > 10)
+                        ViewData["last-comment-id"] = comments.Last().Id;
+                    return View("Comments_builder", comments.Take(10).ToList());
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+        }
+        [HttpGet]
         [Route("load_more")]
         public async Task<IActionResult> Load_more_comments(int comment_id, int article_id)
         {
@@ -38,18 +66,11 @@ namespace Dublongold_site.Controllers
                         {
                             ViewData["Main_comment"] = main_comment;
                             await db_context.Entry(main_comment).Collection(c => c.Replying_comments).LoadAsync();
-                            foreach (Article_comment reply_comment in main_comment.Replying_comments)
-                            {
-                                await db_context.Entry(reply_comment).Collection(c => c.Users_who_liked).LoadAsync();
-                                await db_context.Entry(reply_comment).Collection(c => c.Users_who_disliked).LoadAsync();
-                                await db_context.Entry(reply_comment).Collection(c => c.Replying_comments).LoadAsync();
-                                await db_context.Entry(reply_comment).Reference(c => c.Author).LoadAsync();
-                            }
-                            List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, main_comment.Replying_comments, sort_by)
-                                .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id).Take(11).ToList();
+
+                            List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, main_comment.Replying_comments, sort_by, comment_id, article_id);
                             if (comments.Count > 10)
                                 Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
-                            return View("/Views/Comments/Load_comments.cshtml", comments.Take(10).ToList());
+                            return View(comments.Take(10).ToList());
                         }
                         else
                         {
@@ -57,22 +78,10 @@ namespace Dublongold_site.Controllers
                                         .Include(c => c.Comments).FirstOrDefaultAsync();
                             if (article is not null)
                             {
-                                foreach (Article_comment temp_comment in article.Comments)
-                                {
-                                    await db_context.Entry(temp_comment).Collection(c => c.Users_who_liked).LoadAsync();
-                                    await db_context.Entry(temp_comment).Collection(c => c.Users_who_disliked).LoadAsync();
-                                }
-
-                                List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, article.Comments, sort_by)
-                                    .SkipWhile(c => c.Id != last_comment.Id || c.Article_id != last_comment.Article_id || c.Reply_to_comment != null).Take(11).ToList();
-                                foreach (Article_comment temp_comment in comments)
-                                {
-                                    await db_context.Entry(temp_comment).Collection(c => c.Replying_comments).LoadAsync();
-                                    await db_context.Entry(temp_comment).Reference(c => c.Author).LoadAsync();
-                                }
+                                List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments, sort_by, comment_id, article_id);
                                 if (comments.Count > 10)
                                     Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
-                                return View("/Views/Comments/Load_comments.cshtml", comments.Take(10).ToList());
+                                return View(comments.Take(10).ToList());
                             }
                             else
                                 return NotFound();
@@ -120,7 +129,7 @@ namespace Dublongold_site.Controllers
                     HttpContext.Response.Headers.Add("reply-comment-id", free_comment_id.ToString());
                     db_context.Entry(comment).Reference(c => c.Author).Load();
                     db_context.Entry(comment).Reference(c => c.Reply_to_comment).Load();
-                    return View("/Views/Comments/Comment_builder.cshtml", comment);
+                    return View("/Views/Comment_control/Comment_builder.cshtml", comment);
                 }
             }
         }
@@ -190,7 +199,7 @@ namespace Dublongold_site.Controllers
         }
         [HttpPost]
         [Route("build_comments/{comment_id:int}/{article_id:int}")]
-        public async Task<IActionResult> Build_replies_comments(int comment_id, int article_id)
+        public async Task<IActionResult> Comments_builder(int comment_id, int article_id)
         {
             string? sort_by = Request.Headers["sort-by"];
             using (db_context)
@@ -200,21 +209,14 @@ namespace Dublongold_site.Controllers
                 if (comment is not null)
                 {
                     await db_context.Entry(comment).Collection(c => c.Replying_comments).LoadAsync();
-                    foreach (Article_comment reply_comment in comment.Replying_comments)
-                    {
-                        await db_context.Entry(reply_comment).Reference(c => c.Author).LoadAsync();
-                        await db_context.Entry(reply_comment).Collection(c => c.Replying_comments).LoadAsync();
-                        await db_context.Entry(reply_comment).Collection(c => c.Users_who_liked).LoadAsync();
-                        await db_context.Entry(reply_comment).Collection(c => c.Users_who_disliked).LoadAsync();
-                    }
 
                     ViewData["Main_comment"] = comment;
                     HttpContext.Response.Headers.Add("replies-count", comment.Replying_comments.Count.ToString());
 
-                    List<Article_comment> comments = Sort_sequence_by.Sort_by(db_context, comment.Replying_comments, sort_by).Take(11).ToList();
+                    List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, comment.Replying_comments, sort_by);
                     if (comments.Count > 10)
                         ViewData["last-comment-id"] = comments.Last().Id;
-                    return View("/Views/Comments/Comments_builder.cshtml", comments.Take(10).ToList());
+                    return View(comments.Take(10).ToList());
                 }
                 else
                 {

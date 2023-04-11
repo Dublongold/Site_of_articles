@@ -46,7 +46,7 @@ namespace Dublongold_site.Useful_classes
                             .Contains(name_or_text_of_article_sequence)
                         )
                         || (find_id && a.Id.ToString().ToLower().Contains(name_or_text_of_article)) );
-                articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, article_sequence, sort_by, last_article_id);
+                articles = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article_sequence, sort_by, last_article_id);
                 return articles;
             }
         }

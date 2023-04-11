@@ -15,17 +15,13 @@
 
 @if (Model.Count > 0)
 {
-    @foreach (Article_comment comment in Model.Take(10).ToList())
+    @foreach (Article_comment comment in Model)
     {
         if (Main_comment != comment.Reply_to_comment)
         {
             continue;
         }
-        await Html.RenderPartialAsync("/Views/Comments/Comment_builder.cshtml",comment);
-    }
-    @if(ViewData["last-comment-id"] is int last_comment_id_var)
-    {
-        <button id="load_more_comments" last_comment_id = "@last_comment_id_var">Завантажити ще...</button>
+        await Html.RenderPartialAsync("/Views/Comment_control/Comment_builder.cshtml",comment);
     }
 }
 else

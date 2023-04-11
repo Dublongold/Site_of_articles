@@ -6,6 +6,8 @@
     User_account? user_account = null;
     string comments_class = "comments-of-article";
     string? reply_to_comment = null;
+    string? is_sort_comments_action = ViewContext.HttpContext.Request.Headers["is-sort-comments-action"].ToString();
+    int number_of_comments = 0;
     if (Main_comment is Article_comment)
     {
         comments_class = "reply-comments";
@@ -13,23 +15,43 @@
     }
     using(Database_context db_context = new())
     {
+        Article_comment? first_comment = Model.FirstOrDefault();
+        if(first_comment is not null)
+            number_of_comments = db_context.Article_comments.Where(c => c.Article_id == first_comment.Article_id).Count();
         if (User.Identity is not null)
         {
             user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity.Name);
         }
     }
 }
-
+@if((is_sort_comments_action is null ||  is_sort_comments_action.ToLower() != "true") && comments_class != "reply-comments")
+{
+<div id="title_text_of_comments">
+@if (Model.Count > 0)
+{
+<text>
+    Коментарі(<span id = "number_of_comments">@number_of_comments</span>):
+    <div id="sort_comments_by_container">
+        <span id="sort_comments_by_text">Впорядкувати:</span>
+        <select id="sort_comments_by">
+            <option value="date" selected>За датою створення</option>
+            <option value="rating">За рейтингом</option>
+        </select>
+    </div>
+</text>
+}
+</div>
+}       
 <div class = "@comments_class" @reply_to_comment>
     @if (Model.Count > 0)
     {
-        @foreach (Article_comment comment in Model.Take(10).ToList())
+        @foreach (Article_comment comment in Model)
         {
             if (Main_comment != comment.Reply_to_comment)
             {
                 continue;
             }
-            await Html.RenderPartialAsync("/Views/Comments/Comment_builder.cshtml",comment);
+            await Html.RenderPartialAsync("/Views/Comment_control/Comment_builder.cshtml",comment);
         }
         @if(ViewData["last-comment-id"] is int last_comment_id_var)
         {

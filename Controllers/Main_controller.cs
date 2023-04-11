@@ -26,12 +26,12 @@ namespace Dublongold_site.Controllers
             {
                 string? sort_by = Request.Headers["sort-by"];
 
-                List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by);
+                List<Article> articles = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by);
 
                 if (articles.Count > 10)
                     ViewData["last-article-id"] = articles.Last().Id;
 
-                return View("Home", articles.Take(10).ToList());
+                return View(articles.Take(10).ToList());
             }
         }
         [HttpGet]

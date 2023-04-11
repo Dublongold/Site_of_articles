@@ -77,40 +77,59 @@ namespace Dublongold_site.Useful_classes
                 }
             }
         }
-        public static async Task Load_data(Database_context db_context, Article article)
+        public static async Task Load_element_data<TLoad_object>(Database_context db_context, TLoad_object element) where TLoad_object:ISort_object
         {
-            var temp_article = await db_context.Articles.Where(art => art.Id == article.Id)
-                .Include(art => art.Authors)
-                .Include(art => art.Users_who_liked)
-                .Include(art => art.Users_who_disliked)
-                .Include(art => art.Users_who_have_read)
-                .Include(art => art.Comments).FirstOrDefaultAsync();
-        }
-        public static async Task Load_sequence_data(Database_context db_context, IEnumerable<Article> articles)
-        {
-            foreach (Article article in articles)
+            if (element is Article)
             {
-                await Load_data(db_context, article);
+                var temp_article = await db_context.Articles.Where(art => art.Id == element.Id)
+                    .Include(art => art.Authors)
+                    .Include(art => art.Users_who_liked)
+                    .Include(art => art.Users_who_disliked)
+                    .Include(art => art.Users_who_have_read)
+                    .Include(art => art.Comments).FirstOrDefaultAsync();
+            }
+            else if (element is Article_comment comment)
+            {
+                var temp_comment = await db_context.Article_comments
+                    .Where(c => c.Id == comment.Id && c.Article_id == comment.Article_id)
+                    .Include(c => c.Author)
+                    .Include(c => c.Users_who_liked)
+                    .Include(c => c.Users_who_disliked)
+                    .Include(c => c.Replying_comments).FirstOrDefaultAsync();
+            }
+        }
+        public static async Task Load_sequence_data<TLoad_object>(Database_context db_context, IEnumerable<TLoad_object> elements) where TLoad_object:ISort_object
+        {
+            foreach (TLoad_object element in elements)
+            {
+                await Load_element_data(db_context, element);
             }
         }
         /// <summary>
-        /// Виконує сортування та довантеження даних статтей.<br/>
-        /// Приймає в параметрах контекст бази даних; послідовність статей; рядок, який вказує на спосіб сортування.
+        /// Виконує сортування та довантеження даних статтей/коментарів.<br/>
+        /// Приймає в параметрах контекст бази даних; послідовність статтей або коментарів; рядок, який вказує на спосіб сортування.<br/>
         /// </summary>
-        /// <param name="db_context">Контекст бази даних. Якщо що, має виконувати Dispose самотушки.</param>
-        /// <param name="articles_sequence">Послідовність статей.</param>
-        /// <param name="sort_by">Спосіб сортування. Може бути або "date", або "rating"</param>
-        /// <returns>Відсортований список статей, в якому довантажені потрібні елементи.</returns>
-        public static async Task<List<Article>> Get_article_with_load_and_sort(Database_context db_context, IEnumerable<Article> articles_sequence, string? sort_by, int last_article_id = -1)
+        /// <param name="db_context">Контекст бази даних.</param>
+        /// <param name="elements_sequence">Послідовність статей/коментарів.</param>
+        /// <param name="sort_by">Спосіб сортування. "date" або "rating"</param>
+        /// <returns>Відсортований список статей/коментарів, в якому довантажені потрібні елементи.<br/>Якщо передана послідовність елементів не є статтями/коментарями, то повертає її без будь-яких дій</returns>
+        public static async Task<List<TLoad_sort_object>> Get_elements_with_load_and_sort<TLoad_sort_object>(Database_context db_context, IEnumerable<TLoad_sort_object> elements_sequence, string? sort_by, int last_element_id = -1, int last_article_id = -1) where TLoad_sort_object:ISort_object
         {
-            articles_sequence = Sort_sequence_by.Sort_by(db_context, articles_sequence, sort_by);
-            if (last_article_id != -1)
+            if (elements_sequence is IEnumerable<Article> || elements_sequence is IEnumerable<Article_comment>)
             {
-                articles_sequence = articles_sequence.SkipWhile(art => art.Id != last_article_id);
+                elements_sequence = Sort_sequence_by.Sort_by(db_context, elements_sequence, sort_by);
+                if (last_element_id != -1 && last_article_id == -1)
+                {
+                    elements_sequence = elements_sequence.SkipWhile(elem => elem.Id != last_element_id);
+                }
+                else if (last_element_id != -1 && last_article_id != -1 && elements_sequence is IEnumerable<Article_comment> comments_sequence)
+                {
+                    elements_sequence = comments_sequence.SkipWhile(elem => elem.Id != last_element_id || elem.Article_id != last_article_id) as IEnumerable<TLoad_sort_object> ?? elements_sequence;
+                }
+                elements_sequence = elements_sequence.Take(11);
+                await Load_sequence_data(db_context, elements_sequence);
             }
-            articles_sequence = articles_sequence.Take(11);
-            await Load_sequence_data(db_context, articles_sequence);
-            return articles_sequence.ToList();
+            return elements_sequence.ToList();
         }
     }
 }

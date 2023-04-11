@@ -196,7 +196,7 @@ namespace Dublongold_site.Controllers
                     string? sort_by = Request.Headers["sort-by"];
                     await Console.Out.WriteLineAsync(DateTime.Now.ToString());
                     await Console.Out.WriteLineAsync(user_account.Id.ToString());
-                    List<Article> articles = await Helper_for_work_with_articles.Get_article_with_load_and_sort(db_context, db_context.Articles.Where(art => art.Authors.Any(u => u.Id == user_account.Id)).AsEnumerable(), sort_by);
+                    List<Article> articles = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, db_context.Articles.Where(art => art.Authors.Any(u => u.Id == user_account.Id)).AsEnumerable(), sort_by);
 
                     if(articles.Count > 10)
                         Response.Headers.Add("last-article-id", articles.Last().Id.ToString());

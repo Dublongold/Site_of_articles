@@ -26,7 +26,7 @@
 
     }
 }
-@if(is_sort_articles_action is null ||  is_sort_articles_action.ToLower() != "true")
+@if((is_sort_articles_action is null ||  is_sort_articles_action.ToLower() != "true") && (TempData["render-articles-in-user-profile"]?.ToString() != "true"))
 {<div id="body_head_text">
     <span id="body_head_text_element">@TempData["body-head-text"]</span>
     <div id="sort_articles_by_container">
