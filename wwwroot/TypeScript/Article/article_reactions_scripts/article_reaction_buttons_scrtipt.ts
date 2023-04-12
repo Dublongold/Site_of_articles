@@ -26,6 +26,7 @@ async function article_reaction(this_element: HTMLButtonElement, other_element:H
                 if(result_text == "a" || result_text == "r" || result_text == "c")
                 {
                     this_count.textContent = result.headers.get(`${reaction_text_of_this}-count`);
+                        other_count.textContent = result.headers.get(`${reaction_text_of_other}-count`);
                 }
                 if(result_text == "a")
                 {
@@ -39,7 +40,6 @@ async function article_reaction(this_element: HTMLButtonElement, other_element:H
                 {
                     this_element.style.backgroundColor = button_colors[is_like?1:0];
                     other_element.style.backgroundColor = button_colors[2];
-                    other_count.textContent = result.headers.get(`${reaction_text_of_other}-count`);
                 }
             }
             else

@@ -93,3 +93,11 @@
 #sort_comments_by_text{
     font-size: large;
 }
+.article-content-container{
+    overflow-wrap: break-word;
+    margin-bottom: 10px;
+}
+.comment-author-photo{
+    max-width:25vh;
+    max-height:50px;
+}

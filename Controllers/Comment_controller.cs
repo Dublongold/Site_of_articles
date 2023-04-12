@@ -31,11 +31,7 @@ namespace Dublongold_site.Controllers
                 {
                     Console.WriteLine("Sort by: " + sort_by);
                     List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), sort_by);
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Console.WriteLine(comments[i].Id);
-                        Console.WriteLine(comments[i].Users_who_liked.Count + ":" + comments[i].Users_who_disliked.Count);
-                    }
+
                     if (comments.Count > 10)
                         ViewData["last-comment-id"] = comments.Last().Id;
                     return View("Comments_builder", comments.Take(10).ToList());
@@ -245,7 +241,7 @@ namespace Dublongold_site.Controllers
                         (string, Article_comment) reaction_result = ((string, Article_comment))Reaction_controller.Set_like_or_dislike(db_context, User, HttpContext, comment, reaction_type);
                         return reaction_result.Item1 switch
                         {
-                            "a" or "c" or "r" => Reaction_result_return(comment, reaction_result.Item1, db_context),
+                            "a" or "c" or "r" => Reaction_result_return(reaction_result.Item2, reaction_result.Item1, db_context),
                             "NotFound" => NotFound(),
                             _ => BadRequest(),
                         };

@@ -1,26 +1,28 @@
 #login_path_user_photo{
-    max-height: 50px;
+    max-height: 48px;
     max-width: 25%;
     float:left;
     margin-right: 5px;
     border: 1px solid rgb(71, 72, 85);
     border-radius: 5px;
+    position:relative;
+    top:-2px;
 }
 
 .login-path-container{
     display: grid;
     grid-template-columns:max-content max-content;
     gap: 10px;
-    margin-top: 3px;
+    height: 100%;
 }
 .user-main-data-container{
     white-space: nowrap;
     width: fit-content;
+    padding: 2px 0px 2px 0px;
 }
 #div_for_login_path{
     display: inline-block;
     vertical-align: top;
-    margin-top: 2px;
     height: 50px;
 }
 .user-other-data-container{

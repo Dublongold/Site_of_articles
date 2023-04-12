@@ -27,6 +27,7 @@ namespace Dublongold_site.Useful_classes
                         http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count().ToString());
                         return "c";
                     }
+                    http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count().ToString());
                     // Add like.
                     return "a";
                 }
@@ -34,6 +35,7 @@ namespace Dublongold_site.Useful_classes
                 {
                     can_like_and_dislike_object.Users_who_liked.Remove(user_who_react);
                     http_context.Response.Headers.Add("like-count", can_like_and_dislike_object.Users_who_liked.Count.ToString());
+                    http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count().ToString());
                     // Remove like.
                     return "r";
                 }
@@ -57,6 +59,7 @@ namespace Dublongold_site.Useful_classes
                         http_context.Response.Headers.Add("like-count", can_like_and_dislike_object.Users_who_liked.Count.ToString());
                         return "c";
                     }
+                    http_context.Response.Headers.Add("like-count", can_like_and_dislike_object.Users_who_liked.Count.ToString());
                     // Add like.
                     return "a";
                 }
@@ -64,6 +67,7 @@ namespace Dublongold_site.Useful_classes
                 {
                     can_like_and_dislike_object.Users_who_disliked.Remove(user_who_react);
                     http_context.Response.Headers.Add("dislike-count", can_like_and_dislike_object.Users_who_disliked.Count.ToString());
+                    http_context.Response.Headers.Add("like-count", can_like_and_dislike_object.Users_who_liked.Count.ToString());
                     // Remove like.
                     return "r";
                 }

@@ -26,7 +26,7 @@ else if (user_account is not null && login_error_message is null)
 {
 <div class="login-path-container">
     <div class="user-main-data-container">
-        <a href="/account/profile/@user_account.Login"><img src = "@user_account.Get_photo" id="login_path_user_photo"/></a>
+        <a href="/account/profile/@user_account.Login"><img src = "@user_account.Get_photo" id="login_path_user_photo" alt = "Фото користувача"/></a>
         Ласкаво просимо, @user_account.Name @user_account.Surname (<a href="/account/profile/@user_account.Login">@@@user_account.Login</a>)
         <br>
         <button id="logout_button">

@@ -15,11 +15,3 @@
 div.author-element{
     text-align:right;
 }
-.article-content-container{
-    overflow-wrap: break-word;
-    margin-bottom: 10px;
-}
-.comment-author-photo{
-    max-width:50px;
-    max-height:50px;
-}

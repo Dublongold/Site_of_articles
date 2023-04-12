@@ -197,19 +197,21 @@ namespace Dublongold_site.Controllers
         [Authenticated_user_filter]
         public async Task<IActionResult> Article_has_been_read(int id)
         {
-            using (db_context)
+            lock (for_lock)
             {
-                Article? article = await db_context.Articles.FirstOrDefaultAsync(art => art.Id == id);
-                User_account? user_account = await db_context.User_accounts.FirstOrDefaultAsync(u => u.Login == User.Identity!.Name);
-                if (article is not null && user_account is not null && article.Users_who_have_read.All(u => u.Login != user_account.Login))
+                using (db_context)
                 {
-                    article.Users_who_have_read.Add(user_account);
-                    article.Users_who_have_read_count = article.Users_who_have_read.Count;
-                    db_context.Articles.Update(article);
-                    await db_context.SaveChangesAsync();
-                    return Ok(article.Users_who_have_read.Count);
+                    Article? article = db_context.Articles.Where(art => art.Id == id).Include(art => art.Users_who_have_read).FirstOrDefault();
+                    User_account? user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity!.Name);
+                    if (article is not null && user_account is not null && article.Users_who_have_read.All(u => u.Login != user_account.Login))
+                    {
+                        article.Users_who_have_read.Add(user_account);
+                        db_context.Articles.Update(article);
+                        db_context.SaveChanges();
+                        return Ok(article.Users_who_have_read.Count);
+                    }
+                    return NotFound();
                 }
-                return NotFound();
             }
         }
         [HttpGet]

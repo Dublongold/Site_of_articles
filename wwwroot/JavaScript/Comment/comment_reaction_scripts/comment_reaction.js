@@ -19,6 +19,7 @@ async function comment_reaction(this_element, other_element, comment_id, is_like
                     var result_text = await result.text();
                     if (result_text == "a" || result_text == "r" || result_text == "c") {
                         this_count.textContent = result.headers.get(`${reaction_text_of_this}-count`);
+                        other_count.textContent = result.headers.get(`${reaction_text_of_other}-count`);
                     }
                     if (result_text == "a") {
                         this_element.style.backgroundColor = button_colors[is_like ? 1 : 0];
@@ -29,7 +30,6 @@ async function comment_reaction(this_element, other_element, comment_id, is_like
                     else if (result_text == "c") {
                         this_element.style.backgroundColor = button_colors[is_like ? 1 : 0];
                         other_element.style.backgroundColor = button_colors[2];
-                        other_count.textContent = result.headers.get(`${reaction_text_of_other}-count`);
                     }
                     change_comment_color(parseInt((is_like ? this_count.textContent : other_count.textContent) ?? "NaN"), parseInt((is_like ? other_count.textContent : this_count.textContent) ?? "NaN"), comment_id);
                 }

@@ -1,6 +1,6 @@
 #user_profile_photo{
-    max-width: 150px;
-    max-height: 150px;
+    max-width: 200px;
+    max-height: 200px;
     min-width: 50px;
     min-height: 50px;
     border: 3px solid rgb(71, 72, 85);
@@ -38,10 +38,14 @@
     height: 200px;
     display: flex;
     justify-content: center;
-    align-items: center
+    align-items: center;
 }
-#user_full_name, #user_about{
+#user_full_name{
     display:inline-block;
+    
+}
+#user_about{
+    display:block;
 }
 
 #user_name, #user_surname{
@@ -58,7 +62,7 @@
 #user_login, #user_about{
     margin-top: 0px;
     margin-bottom: 7px;
-    width: fit-content;
+    box-sizing:content-box;
     max-width:100%;
 }
 
@@ -71,13 +75,18 @@
     margin-top: 5px;
 }
 
-#save_edit_user_full_name_button, #save_edit_user_account_about{
+#save_edit_user_full_name_button{
+    margin-left: 5px;
+}
+#save_edit_user_account_about{
     margin-left: 5px;
 }
 #edit_user_about{
     display:block;
-    max-width:75vh;
-    max-height:10vh;
+    max-height:7em;
+    width:100%;
+    box-sizing: border-box;
+    resize: vertical;
 }
 #user_about_text{
     display: block;

@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Comments\" />
     <Folder Include="wwwroot\Images\" />
     <Folder Include="wwwroot\Css\" />
   </ItemGroup>
