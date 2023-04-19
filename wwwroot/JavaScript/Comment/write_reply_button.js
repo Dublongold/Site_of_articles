@@ -2,10 +2,7 @@
 async function create_reply_field_to_comment(this_element, comment_id) {
     this_element.disabled = true;
     let comment_container = get_comment_container_by_comment_id(comment_id);
-    let source = "Відповідь";
-    let error_message = "";
-    let where_append = comment_container.querySelector(".comment-reaction-container");
-    let error_message_id = "write_reply_to_" + comment_id;
+    let error_message_editor = new Error_message_editor("Відповідь", comment_container.querySelector(".comment-reaction-container"), "write_reply_to_" + comment_id);
     var check_authorized = await fetch("/account/login/authorized", { method: "get" });
     if (check_authorized.ok) {
         let write_reply_fields = document.getElementsByClassName(`write-reply-field`);
@@ -32,13 +29,13 @@ async function create_reply_field_to_comment(this_element, comment_id) {
     }
     else {
         if (check_authorized.status === 401) {
-            error_message = "Ви неавторизовані. Будь-ласка, авторизуйтеся, щоб мати можливість писати відповіді до коментарів.";
+            error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтеся, щоб мати можливість писати відповіді до коментарів.";
         }
         else {
-            error_message = "Виникла неочікувана помилка.";
+            error_message_editor.error_message = "Виникла неочікувана помилка.";
         }
     }
-    error_message_editor(source, error_message, where_append, error_message_id);
+    error_message_editor.send();
     this_element.disabled = false;
 }
 function create_elements_for_write_reply(comment_container, comment_id) {
@@ -82,10 +79,7 @@ async function submit_write_reply_comment(this_element, comment_id) {
     let swre_n = submit_write_reply_elements.length;
     let cwre_n = cancel_write_reply_elements.length;
     let comment_container = get_comment_container_by_comment_id(comment_id);
-    const source = "Відповідь";
-    let error_message = "";
-    let where_append = this_element.parentElement;
-    const error_message_id = "write_reply_to_" + comment_id;
+    let error_message_editor = new Error_message_editor("Відповідь", this_element.parentElement, "write_reply_to_" + comment_id);
     if (comment_container) {
         if (wrce_n === 1 && wrnte_n === 1 && swre_n === 1 && cwre_n === 1) {
             let reply_content_textarea_element = document.querySelector(".write-reply-content");
@@ -152,24 +146,24 @@ async function submit_write_reply_comment(this_element, comment_id) {
                 else {
                     switch (result.status) {
                         case 401:
-                            error_message = "Ви неавторизовані. Будь-ласка, авторизуйтеся, щоб мати можливість писати відповіді до коментарів.";
+                            error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтеся, щоб мати можливість писати відповіді до коментарів.";
                             break;
                         case 404:
-                            error_message = "Коментаря, на який ви хотіли відповісти, більше не існує. Оновіть сторінку, щоб він зник на вашій сторінці.";
+                            error_message_editor.error_message = "Коментаря, на який ви хотіли відповісти, більше не існує. Оновіть сторінку, щоб він зник на вашій сторінці.";
                             break;
                         default:
-                            error_message = "Виникла неочікувана помилка.";
+                            error_message_editor.error_message = "Виникла неочікувана помилка.";
                     }
                 }
             }
             else
-                error_message = "Неможливо створити відповідь, яка пуста або містить лише пробільні символи.";
+                error_message_editor.error_message = "Неможливо створити відповідь, яка пуста або містить лише пробільні символи.";
         }
         else
-            error_message = "Знайдено елементів полів для відповідей більше, чем один. Будь-ласка, якщо маєте таку можливість, видаліть зайві поля або скопіюйте текст та оновіть сторінку.";
+            error_message_editor.error_message = "Знайдено елементів полів для відповідей більше, чем один. Будь-ласка, якщо маєте таку можливість, видаліть зайві поля або скопіюйте текст та оновіть сторінку.";
     }
     else
-        error_message = "Не знайдено HTML елемент коментаря.";
-    error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.error_message = "Не знайдено HTML елемент коментаря.";
+    error_message_editor.send();
     this_element.disabled = false;
 }

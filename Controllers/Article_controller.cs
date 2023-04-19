@@ -26,6 +26,8 @@ namespace Dublongold_site.Controllers
         {
             using (db_context)
             {
+                if (!db_context.Articles.Any(art => art.Id == id))
+                    return NotFound();
                 Article article = await db_context.Articles.Where(art => art.Id == id)
                                                 .Include(art => art.Authors)
                                                 .Include(art => art.Comments)
@@ -33,10 +35,10 @@ namespace Dublongold_site.Controllers
                                                 .Include(art => art.Users_who_disliked)
                                                 .Include(art => art.Users_who_have_read)
                                                 .FirstAsync();
-                article.Comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), null);
-                if (article.Comments.Count > 10)
-                    ViewData["last-comment-id"] = article.Comments.Last().Id;
-                article.Comments = article.Comments.Take(10).ToList();
+                article.Comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(
+                    db_context,
+                    article.Comments.Where(c => c.Reply_to_comment_id == null),
+                    Response.Headers);
                 return View(article);
             }
         }
@@ -195,7 +197,7 @@ namespace Dublongold_site.Controllers
         [HttpPost]
         [Route("has_been_read/{id:int}")]
         [Authenticated_user_filter]
-        public async Task<IActionResult> Article_has_been_read(int id)
+        public IActionResult Article_has_been_read(int id)
         {
             lock (for_lock)
             {
@@ -215,40 +217,51 @@ namespace Dublongold_site.Controllers
             }
         }
         [HttpGet]
-        [Route("load_more/{where_load}/{article_id}/{name_or_text_of_article?}")]
-        public async Task<IActionResult> Load_more_articles(string article_id, string where_load, string? name_or_text_of_article)
+        [Route("load_more/{where_load}/{name_or_text_of_article?}")]
+        public async Task<IActionResult> Load_more_articles(string article_ids_str, string where_load, string? name_or_text_of_article)
         {
             using (db_context)
             {
-                string? sort_by = Request.Headers["sort-by"];
 
-                if (int.TryParse(article_id, out int last_article_id))
+                int[]? article_ids = null;
+                int k = 0;
+                string[] article_ids_array = article_ids_str.Split(",");
+                if (article_ids_array.Length > 0)
                 {
-                    Article? article = await db_context.Articles.FirstOrDefaultAsync(art => art.Id == last_article_id);
-                    if (article is not null)
+                    article_ids = new int[article_ids_array.Length <= 10 ? article_ids_array.Length : 10];
+                    foreach (string article_id_str in article_ids_array)
+                    {
+                        if (!int.TryParse(article_id_str, out article_ids[k]))
+                        {
+                            article_ids[k] = 0;
+                        }
+                        k++;
+                    }
+                }
+                string? sort_by = Request.Headers["sort-by"];
+                if (article_ids is not null)
+                {
+                    if (article_ids.Length > 0 && db_context.Articles.Count() - article_ids.Length > 0)
                     {
                         where_load = where_load.ToLower();
+                        List<Article> result;
                         if (where_load == "home" || where_load == "user" || where_load == "profile" || where_load == "")
                         {
-                            List<Article> articles = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, db_context.Articles.AsEnumerable(), sort_by, last_article_id);
-                            if (articles.Count > 10)
-                                Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
-                            return View(articles.Take(10).ToList());
+                            result = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, db_context.Articles, Response.Headers, sort_by, article_ids);
                         }
                         else
                         {
-
-                            List<Article> articles = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by, last_article_id);
-                            if (articles.Count > 10)
-                                Response.Headers.Add("last-article-id", articles.Last().Id.ToString());
-                            return View(articles.Take(10).ToList());
+                            result = await Find_action.Find(db_context, ViewData, HttpContext, name_or_text_of_article, sort_by, article_ids);
                         }
+                        return View(result);
                     }
                     else
+                    {
                         return NotFound();
+                    }
                 }
                 else
-                    return BadRequest("not integer");
+                    return BadRequest();
             }
         }
         [HttpGet]
@@ -259,7 +272,6 @@ namespace Dublongold_site.Controllers
             {
                 if(where_sort is not null)
                     where_sort = Uri.UnescapeDataString(where_sort);
-                Console.WriteLine(where_sort);
                 if (string.IsNullOrEmpty(where_sort) || where_sort == "home")
                     return RedirectToAction("Home", "Main_control");
                 else if (where_sort.ToLower() == "account/articles")

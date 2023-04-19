@@ -40,7 +40,10 @@ async function change_user_photo(event: Event)
                 {
                     if(this_element)
                     {
-                        error_message_editor("Зміна фото", "Не вдалося змінити фото. Виникла помилка з кодом: " + change_photo_request.status, this_element.parentElement, "change_user_photo");
+                        let error_message_editor = new Error_message_editor("Зміна фото", this_element.parentElement, "change_user_photo");
+                        error_message_editor.need_write_source = false;
+                        error_message_editor.error_message = "Не вдалося змінити фото. Виникла помилка з кодом: " + change_photo_request.status;
+                        error_message_editor.send();
                     }
                     else
                     {

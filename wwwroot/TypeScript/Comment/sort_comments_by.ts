@@ -1,9 +1,6 @@
 async function sort_comments_by(event: Event)
 {
-    const source = "Впорядковування коментарів";
-    let error_message = "";
-    let where_append: HTMLElement | null = null;
-    const error_message_id = "sort_comments_by";
+    let error_message_editor = new Error_message_editor("Впорядковування коментарів", null, "sort_comments_by");
     if(event)
     {
         let this_element = event.currentTarget as HTMLSelectElement;
@@ -18,27 +15,32 @@ async function sort_comments_by(event: Event)
                     let submit_write_comment = document.getElementById("submit_write_comment") as HTMLButtonElement;
                     let title_text_of_comments = document.getElementById("title_text_of_comments") as HTMLDivElement;
                     let comments_of_article = title_text_of_comments.parentElement ? title_text_of_comments.parentElement.querySelector(".comments-of-article") : document.querySelector(".comments-of-article");
-                    if(submit_write_comment && title_text_of_comments && comments_of_article)
+                    if(title_text_of_comments && comments_of_article)
                     {
                         /* Потрібно для заборони дій з статтями до тих пір, поки не завантажаться вони після сотрування.*/
                         let block_actions_with_comments_element = document.createElement("div");
                         block_actions_with_comments_element.className = "block-click-when-load-comments";
 
-                        submit_write_comment.disabled = true;
+                        if(submit_write_comment)
+                            submit_write_comment.disabled = true;
 
                         title_text_of_comments.before(block_actions_with_comments_element);
                         
                         const sort_by_request = await fetch(`/comment/sort_by/${article_id}`, {headers:{"is-sort-comments-action": "true", "sort-by": sort_by}});
                         if(sort_by_request.ok)
                         {
-                            title_text_of_comments.insertAdjacentHTML("afterend", await sort_by_request.text());
+                            if(title_text_of_comments.nextElementSibling)
+                                title_text_of_comments.nextElementSibling.insertAdjacentHTML("afterend", await sort_by_request.text());
+                            else
+                                title_text_of_comments.insertAdjacentHTML("afterend", await sort_by_request.text());
                             comments_of_article.remove();
                             add_event_listeners_for_comments_buttons();
                             add_event_listener_for_load_more_comments();
                         }
                         else
                             console.log(sort_by_request.status)
-                        submit_write_comment.disabled = false;
+                        if(submit_write_comment)
+                            submit_write_comment.disabled = false;
                         block_actions_with_comments_element.remove();
                     }
                     else
@@ -55,7 +57,7 @@ async function sort_comments_by(event: Event)
     }
     else
         console.log(1);
-    error_message_editor(source, error_message, where_append, error_message_id);
+    error_message_editor.send();
 }
 
 document.addEventListener("DOMContentLoaded", function(){

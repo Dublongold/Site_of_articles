@@ -15,6 +15,7 @@
 }
 .comment-author-login-and-full-name-container{
     display:inline-block;
+    vertical-align: top;
 }
 .comment-date{
     position: absolute;
@@ -100,4 +101,25 @@
 .comment-author-photo{
     max-width:25vh;
     max-height:50px;
+}
+#new_comment_writed_message, .comment-has-changed, .comment-deleted{
+    font-style: italic;
+    color:rgba(255, 255, 255, 0.459);
+}
+.comment-edited-message{
+    font-style: italic;
+    color:rgba(255, 255, 255, 0.459);
+    text-align: right;
+    padding-right: 10px;
+    margin-top: -15px;
+}
+.comment-edited-message:empty{
+    margin-top: 0px;
+}
+.block-click-when-load-comments{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left:0px;
+    background-color: rgba(0, 0, 0, 0.3);
 }

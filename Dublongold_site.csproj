@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\JavaScript\Libraries\**" />
     <Compile Remove="wwwroot\Temp images\**" />
+    <Content Remove="wwwroot\JavaScript\Libraries\**" />
     <Content Remove="wwwroot\Temp images\**" />
+    <EmbeddedResource Remove="wwwroot\JavaScript\Libraries\**" />
     <EmbeddedResource Remove="wwwroot\Temp images\**" />
+    <None Remove="wwwroot\JavaScript\Libraries\**" />
     <None Remove="wwwroot\Temp images\**" />
+    <TypeScriptCompile Remove="wwwroot\JavaScript\Libraries\**" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ function add_event_listeners_for_comments_buttons(comment_container_elements?:HT
 {
     if(!comment_container_elements)
     {
-        comment_container_elements = document.getElementsByClassName("comment-container");
+        comment_container_elements = document.getElementsByClassName("comment-container new");
         for(let temp_elem of Array.from(comment_container_elements))
         {
             add_event_listeners_for_comment_buttons(temp_elem);
@@ -53,5 +53,6 @@ function add_event_listeners_for_comment_buttons(comment_container:Element)
         let edit_comment_temp_function = function(event:PointerEvent){edit_comment(event, comment_id, edit_comment_temp_function)} as EventListenerOrEventListenerObject;
         comment_edit_button.addEventListener("click", edit_comment_temp_function);
     }
+    comment_container.className = "comment-container";
 }
 document.addEventListener("DOMContentLoaded", function(){add_event_listeners_for_comments_buttons(null)});

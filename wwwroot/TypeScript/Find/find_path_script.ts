@@ -8,41 +8,40 @@ async function check_search_options(event: PointerEvent, checkbox_param: string[
     }
     else
     {
-        let where_append = event.currentTarget !== null && event.currentTarget !== undefined?(event.currentTarget as HTMLInputElement).parentElement:null
-        error_message_editor("Критерій пошуку","Виникла помилка під час спроби налаштувати критерій пошуку.", where_append, checkbox_param[1]);
+        let where_append = event.currentTarget !== null && event.currentTarget !== undefined?(event.currentTarget as HTMLInputElement).parentElement:null;
+        let error_message_editor = new Error_message_editor("Критерій пошуку", where_append, checkbox_param[1]);
+        error_message_editor.error_message = "Виникла помилка під час спроби налаштувати критерій пошуку.";
+        error_message_editor.send();
     }
 }
 
-function validation_find_form(event: PointerEvent)
+function validation_find_form(event: Event)
 {
-    const source = "Пошук";
-    let error_message  = "";
+    let error_message_editor = new Error_message_editor("Пошук", null, "find_path");
+    error_message_editor.need_write_source = false;
     let find_input = document.getElementById("find_input") as HTMLInputElement;
     let find_form = document.getElementById("find_form") as HTMLFormElement;
-    // find_input || event.target || find_form
-    let where_append:HTMLElement|null = null;
-    if(find_input)
+    let find_main_text_and_input_container: HTMLElement | null = null;
+    if(find_form)
     {
-        where_append = find_input;
+        find_main_text_and_input_container = find_form.querySelector(".find-main-text-and-input-container");
+        if(find_main_text_and_input_container)
+        {
+            error_message_editor.where_append = find_main_text_and_input_container;
+        }
+        else
+        {
+            error_message_editor.where_append = find_form;
+        }
     }
-    else if(event.target)
-    {
-        where_append = event.target as HTMLElement;
-    }
-    else if(find_form)
-    {
-        where_append = find_form;
-    }
-    const error_message_id = "find_path";
-
     
     if(!find_input)
     {
-        error_message = "Не можливо знайти find_input...";
+        error_message_editor.error_message = "Не можливо знайти find_input...";
     }
     else if (!find_input.value || find_input.value.trim().length === 0)
     {
-        error_message = "Будь-ласка, напишіть текст, по якому буде виконуватися пошук.";
+        error_message_editor. error_message = "Будь-ласка, напишіть текст, по якому буде виконуватися пошук.";
     }
     else
     {   
@@ -63,16 +62,16 @@ function validation_find_form(event: PointerEvent)
                 find_form.submit();
             }
             else
-                error_message = "Не знайдено форми, яка б відправила дані для пошуку ваших статтей";
+                error_message_editor.error_message = "Не знайдено форми, яка б відправила дані для пошуку ваших статтей";
         }
         else
         {
-            error_message = "Хоча б один критерій повинен бути обраним!";
+            error_message_editor.error_message = "Хоча б один критерій повинен бути обраним!";
         }
     }
-    if(error_message !== "")
+    if(error_message_editor.error_message)
     {
-        error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.send();
     }
 }
 

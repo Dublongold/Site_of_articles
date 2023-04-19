@@ -1,0 +1,38 @@
+﻿@using Dublongold_site.Models
+@model Article
+@{
+}
+<div class = "preview-article-container new">
+    <div class="preview-article-data-container">
+        <div class = "article-title-image-container">
+            <a href="/article/read/@(Model.Id)">
+                <img src="@(Model.Title_image)" class="article-title-image"/>
+            </a>
+        </div>
+        <div class = "article-other-info-container">
+            <span style="font:blod">
+                <a href="/article/read/@(Model.Id)">@Model.Theme</a>
+            </span>
+            <span style="float: right;">Id:<span class="article-id">@Model.Id</span></span>
+            <p style="margin-bottom:2px">@Html.Raw(Model.Description)</p>
+            <button class = "article-open-button" article_id = "@Model.Id">Відкрити</button>
+            <br />
+            <div class = "other-info-about-article-container">
+                Прочитало: @Model.Users_who_have_read.Count
+                <br/>
+                Коментарів: @Model.Comments.Count
+                <br/>
+                Сподобалось: @Model.Users_who_liked.Count, Не сподобалось: @Model.Users_who_disliked.Count()
+                <span style="float: right;">
+                    Автор@(Model.Authors.Count > 1 ? "и" : ""): @Html.Raw(Model.Authors.Count > 0 ? Model.Authors.Select(x => "<a href = \"/account/profile/" + x.Login + "\">@" + x.Login + "</a>").Aggregate((u1, u2) => u1 + ", " + u2) : "Ніхто?")
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="article-action-buttons">
+        @if (ViewData["is_user_article"] is bool is_user_article && is_user_article && Model.Authors.Any(u => u.Login == User.Identity!.Name))
+        {
+            <button class = "article-actions-button" article_id = "@Model.Id">Дії</button>
+        }
+    </div>
+</div>

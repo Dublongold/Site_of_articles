@@ -3,14 +3,6 @@
 @{
     Layout = null;
     Article_comment? Main_comment = ViewData["Main_comment"] as Article_comment;
-    User_account? user_account = null;
-    using(Database_context db_context = new())
-    {
-        if (User.Identity is not null)
-        {
-            user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity.Name);
-        }
-    }
 }
 
 @if (Model.Count > 0)

@@ -4,11 +4,8 @@ async function comment_reaction(this_element, other_element, comment_id, is_like
         this_element.disabled = true;
         let reaction_text_of_this = is_like ? "like" : "dislike";
         let reaction_text_of_other = !is_like ? "like" : "dislike";
-        const source = `Кнопка "${is_like ? "П" : "Не п"}одобається"`;
-        let error_message = "";
-        let this_parent = this_element.parentElement;
-        let where_append = this_parent && this_parent.parentElement ? this_parent.parentElement : null;
-        const error_message_id = "article_reaction";
+        let where_append = this_element.parentElement && this_element.parentElement.parentElement ? this_element.parentElement.parentElement : null;
+        let error_message_editor = new Error_message_editor(`Кнопка "${is_like ? "П" : "Не п"}одобається"`, where_append, `comment_reaction_${comment_id}`);
         let comment_element = get_comment_container_by_comment_id(comment_id);
         if (comment_element) {
             let this_count = comment_element.querySelector(`.number-of-comment-${reaction_text_of_this}s`);
@@ -35,21 +32,21 @@ async function comment_reaction(this_element, other_element, comment_id, is_like
                 }
                 else {
                     if (result.status === 401) {
-                        error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати на цей коментар.";
+                        error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати на цей коментар.";
                     }
                     else if (result.status === 404) {
-                        error_message = "Вибачте, але цього коментаря не існує. Спробуйте оновити сторінку.";
+                        error_message_editor.error_message = "Вибачте, але цього коментаря не існує. Спробуйте оновити сторінку.";
                     }
                     else {
-                        error_message = `Виникла неочікувана помилка з кодом ${result.status}.`;
+                        error_message_editor.error_message = `Виникла неочікувана помилка з кодом ${result.status}.`;
                     }
                 }
             }
             else {
-                error_message = "Проблема зі знаходженням потрібних елементів для виконання цієї дії.";
+                error_message_editor.error_message = "Проблема зі знаходженням потрібних елементів для виконання цієї дії.";
             }
         }
-        error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.send();
         this_element.disabled = false;
     }
 }

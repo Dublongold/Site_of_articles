@@ -1,9 +1,9 @@
 ﻿@using Dublongold_site.Models
 @model List<Article_comment>
+@addTagHelper *, Dublongold_site
 @{
     Layout = null;
     Article_comment? Main_comment = ViewData["Main_comment"] as Article_comment;
-    User_account? user_account = null;
     string comments_class = "comments-of-article";
     string? reply_to_comment = null;
     string? is_sort_comments_action = ViewContext.HttpContext.Request.Headers["is-sort-comments-action"].ToString();
@@ -18,10 +18,6 @@
         Article_comment? first_comment = Model.FirstOrDefault();
         if(first_comment is not null)
             number_of_comments = db_context.Article_comments.Where(c => c.Article_id == first_comment.Article_id).Count();
-        if (User.Identity is not null)
-        {
-            user_account = db_context.User_accounts.FirstOrDefault(u => u.Login == User.Identity.Name);
-        }
     }
 }
 @if((is_sort_comments_action is null ||  is_sort_comments_action.ToLower() != "true") && comments_class != "reply-comments")
@@ -41,6 +37,7 @@
 </text>
 }
 </div>
+<div id = "new_comment_writed_message"></div>
 }       
 <div class = "@comments_class" @reply_to_comment>
     @if (Model.Count > 0)
@@ -53,9 +50,9 @@
             }
             await Html.RenderPartialAsync("/Views/Comment_control/Comment_builder.cshtml",comment);
         }
-        @if(ViewData["last-comment-id"] is int last_comment_id_var)
+        @if(ViewContext.HttpContext.Response.Headers["need-load-more"] == "1")
         {
-            <button class="load-more-comments" last_comment_id = "@last_comment_id_var">Завантажити ще...</button>
+            <button class="load-more-comments">Завантажити ще...</button>
         }
     }
     else

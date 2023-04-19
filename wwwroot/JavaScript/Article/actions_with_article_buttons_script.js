@@ -82,33 +82,29 @@ function cancel_actions_with_article(event, article_id, event_for_remove) {
     let event_for_pass = function (event) { actions_with_article(event, article_id, event_for_pass); };
     this_element.addEventListener("click", event_for_pass);
 }
-function add_event_listeners_for_actions_with_article_buttons() {
-    let article_open_buttons = document.querySelectorAll(".article-open-button");
-    let article_actions_buttons = document.querySelectorAll(".article-actions-button");
-    if (article_open_buttons.length > 0) {
-        for (let open_button of Array.from(article_open_buttons)) {
-            let article_id = open_button.getAttribute("article_id") ?? "";
+function add_interactive_with_new_articles() {
+    let preview_article_elements = document.getElementsByClassName("preview-article-container new");
+    for (let preview_article_element of Array.from(preview_article_elements)) {
+        let article_open_button = preview_article_element.querySelector(".article-open-button");
+        let article_actions_button = preview_article_element.querySelector(".article-actions-button");
+        if (article_open_button) {
+            let article_id = article_open_button.getAttribute("article_id") ?? "";
             if (article_id) {
-                open_button.removeAttribute("article_id");
-                open_button.addEventListener("click", function (event) {
-                    open_article(event, article_id);
-                });
+                article_open_button.removeAttribute("article_id");
+                article_open_button.addEventListener("click", function (event) { open_article(event, article_id); });
             }
         }
-    }
-    if (article_actions_buttons.length > 0) {
-        for (let actions_button of Array.from(article_actions_buttons)) {
-            if (actions_button.hasAttribute("article_id")) {
-                let article_id = actions_button.getAttribute("article_id") ?? "";
-                if (article_id) {
-                    actions_button.removeAttribute("article_id");
-                    let event_for_pass = function (event) { actions_with_article(event, article_id, event_for_pass); };
-                    actions_button.addEventListener("click", event_for_pass);
-                }
+        if (article_actions_button) {
+            let article_id = article_actions_button.getAttribute("article_id") ?? "";
+            if (article_id) {
+                article_actions_button.removeAttribute("article_id");
+                let event_for_pass = function (event) { actions_with_article(event, article_id, event_for_pass); };
+                article_actions_button.addEventListener("click", event_for_pass);
             }
         }
+        preview_article_element.className = "preview-article-container";
     }
 }
 document.addEventListener("DOMContentLoaded", function () {
-    add_event_listeners_for_actions_with_article_buttons();
+    add_interactive_with_new_articles();
 });

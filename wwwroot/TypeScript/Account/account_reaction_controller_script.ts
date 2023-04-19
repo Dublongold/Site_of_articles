@@ -4,11 +4,8 @@ async function account_reaction(this_element: HTMLButtonElement, other_element:H
     {
         this_element.disabled = true;
         
-        const source = `Кнопка "${is_like?"П":"Не п"}одобається"`;
-        let error_message = "";
-        let this_parent = this_element.parentElement;
-        let where_append = this_parent && this_parent.parentElement ? this_parent.parentElement : null;
-        const error_message_id = "account_reaction";
+        let where_append = this_element.parentElement && this_element.parentElement.parentElement ? this_element.parentElement.parentElement : null;
+        let error_message_editor = new Error_message_editor(`Кнопка "${is_like?"П":"Не п"}одобається"`, where_append, "account_reaction");
 
         let user_login_element = document.querySelector("#user_login");
         let user_login = "";
@@ -58,32 +55,32 @@ async function account_reaction(this_element: HTMLButtonElement, other_element:H
                 {
                     if(result.status === 401)
                     {
-                        error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати на цю статтю.";
+                        error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати на цю статтю.";
                     }
                     else if(result.status === 403)
                     {
-                        error_message = "Самому собі подобатися можна, але тут цього робити за допомогою цієї кнопки не можна :).";
+                        error_message_editor.error_message = "Самому собі подобатися можна, але тут цього робити за допомогою цієї кнопки не можна :).";
                     }
                     else if(result.status === 404)
                     {
-                        error_message = "Вибачте, але цього користувача не існує. Спробуйте оновити сторінку або перейти на головну.";
+                        error_message_editor.error_message = "Вибачте, але цього користувача не існує. Спробуйте оновити сторінку або перейти на головну.";
                     }
                     else
                     {
-                        error_message = "Виникла неочікувана помилка.";
+                        error_message_editor.error_message = "Виникла неочікувана помилка.";
                     }
                 }
             }
             else
             {
-                error_message = "Проблема зі знаходженням потрібних елементів для виконання цієї дії.";
+                error_message_editor.error_message = "Проблема зі знаходженням потрібних елементів для виконання цієї дії.";
             }
         }
         else
         {
-            error_message = "Проблема зі знаходженням логіну користувача.";
+            error_message_editor.error_message = "Проблема зі знаходженням логіну користувача.";
         }
-        error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.send();
 
         this_element.disabled = false;
     }

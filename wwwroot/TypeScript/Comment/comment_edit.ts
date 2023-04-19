@@ -15,6 +15,11 @@ function edit_comment(event : PointerEvent, comment_id:string, reference_to_butt
                 let comment_content_container = comment_container.getElementsByClassName("comment-content-container")[0];
                 if(comment_content_container && !comment_content_container.hasAttribute("edit_comment_content"))
                 {
+                    let comment_edited_message = comment_container.querySelector(".comment-edited-message") as HTMLDivElement;
+                    if(comment_edited_message)
+                    {
+                        comment_edited_message.hidden = true;
+                    }
                     current_target.removeEventListener("click", reference_to_button_function);
                     let comment_content_text = comment_content_container.textContent ?? "";
                     let edit_comment_temp_function = function(event:PointerEvent){cancel_editing_comment_content(event, comment_content_text, comment_id, edit_comment_temp_function)} as EventListenerOrEventListenerObject;
@@ -51,14 +56,10 @@ async function save_changes_of_comment_content(event:PointerEvent, comment_id:st
         {
             current_target.disabled = true;
             let comment_container = get_comment_container_by_comment_id(comment_id);
-            const source = "Редагування: зберегти";
-            let error_message = "";
-            let where_append: HTMLElement|null;
+            let error_message_editor = new Error_message_editor("Редагування: зберегти", null,  "save_edit_content_of_comment_with_id" + comment_id);
             if(comment_container && comment_container.firstElementChild)
-                where_append = comment_container.firstElementChild as HTMLElement;
-            else
-                where_append = null;
-            const error_message_id = "save_edit_content_of_comment_with_id" + comment_id;
+                error_message_editor.where_append = comment_container.firstElementChild as HTMLElement;
+            
             if(comment_container)
             {
                 let comment_content_container = comment_container.getElementsByClassName("comment-content-container")[0] as unknown as HTMLDivElement;
@@ -77,6 +78,11 @@ async function save_changes_of_comment_content(event:PointerEvent, comment_id:st
                                 const edit_request = await fetch(`/comment/edit/${comment_id}/${article_id}/?new_content=${formated_text}`, {method:"put"});
                                 if(edit_request.ok)
                                 {
+                                    let comment_edited_message = comment_container.querySelector(".comment-edited-message") as HTMLDivElement;
+                                    if(comment_edited_message)
+                                    {
+                                        comment_edited_message.hidden = false;
+                                    }
                                     cancel_editing_comment_content_function(edit_button_of_comment, comment_id, comment_content_container, comment_content_text, reference_to_cancel_button_function);
                                 }
                                 else
@@ -84,28 +90,28 @@ async function save_changes_of_comment_content(event:PointerEvent, comment_id:st
                                     switch(edit_request.status)
                                     {
                                         case 404:
-                                            error_message = "Вибачте, але цього коментаря не було знайдено. Можливо, його вже не існує, бо хтось видалив раніше, чим ви встигли відредагувати.";
+                                            error_message_editor.error_message = "Вибачте, але цього коментаря не було знайдено. Можливо, його вже не існує, бо хтось видалив раніше, чим ви встигли відредагувати.";
                                             break;
                                         case 401:
-                                            error_message = "Ви неавторизовані! Будь-ласка, авторизуйтесь, щоб мати можливість редагувати коментарі.";
+                                            error_message_editor.error_message = "Ви неавторизовані! Будь-ласка, авторизуйтесь, щоб мати можливість редагувати коментарі.";
                                             break;
                                         case 500:
-                                            error_message = `Виникла неочікувана помилка на стороні серверу. Можливо, якісь проблеми з базою даних.`;
+                                            error_message_editor.error_message = `Виникла неочікувана помилка на стороні серверу. Можливо, якісь проблеми з базою даних.`;
                                             break;
                                         default:
-                                            error_message = `Виникла неочікувана помилка з кодом ${edit_request.status}.`;
+                                            error_message_editor.error_message = `Виникла неочікувана помилка з кодом ${edit_request.status}.`;
                                     }
                                 }
                             }
                             else
                             {
-                                error_message = "Коментар не має бути пустим або містити лише пробільні символи. Якщо хочете його видалити, то натисніть кнопку \"Видалити\", яка знаходиться там же, де й кнопка \"Редагувати\"";
+                                error_message_editor.error_message = "Коментар не має бути пустим або містити лише пробільні символи. Якщо хочете його видалити, то натисніть кнопку \"Видалити\", яка знаходиться там же, де й кнопка \"Редагувати\"";
                             }
                         }
                     }
                 }
             }
-            error_message_editor(source, error_message, where_append, error_message_id);
+            error_message_editor.send();
             if(event && current_target)
             {
                 current_target.disabled = false;
@@ -125,6 +131,11 @@ function cancel_editing_comment_content(event:PointerEvent, set_comment_content:
             let comment_container = get_comment_container_by_comment_id(comment_id);
             if(comment_container)
             {
+                let comment_edited_message = comment_container.querySelector(".comment-edited-message") as HTMLDivElement;
+                if(comment_edited_message)
+                {
+                    comment_edited_message.hidden = false;
+                }
                 let comment_content_container = comment_container.querySelector(".comment-content-container") as HTMLDivElement|null;
                 if(comment_content_container && comment_content_container.hasAttribute("edit_comment_content"))
                 {

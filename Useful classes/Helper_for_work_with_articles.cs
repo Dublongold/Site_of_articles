@@ -1,6 +1,7 @@
 ﻿using Dublongold_site.Models;
 using Microsoft.EntityFrameworkCore;
 using Dublongold_site.Generated_regexs;
+using System.Linq;
 
 namespace Dublongold_site.Useful_classes
 {
@@ -113,20 +114,27 @@ namespace Dublongold_site.Useful_classes
         /// <param name="elements_sequence">Послідовність статей/коментарів.</param>
         /// <param name="sort_by">Спосіб сортування. "date" або "rating"</param>
         /// <returns>Відсортований список статей/коментарів, в якому довантажені потрібні елементи.<br/>Якщо передана послідовність елементів не є статтями/коментарями, то повертає її без будь-яких дій</returns>
-        public static async Task<List<TLoad_sort_object>> Get_elements_with_load_and_sort<TLoad_sort_object>(Database_context db_context, IEnumerable<TLoad_sort_object> elements_sequence, string? sort_by, int last_element_id = -1, int last_article_id = -1) where TLoad_sort_object:ISort_object
+        public static async Task<List<TLoad_sort_object>> Get_elements_with_load_and_sort<TLoad_sort_object>(Database_context db_context, IEnumerable<TLoad_sort_object> elements_sequence, IHeaderDictionary headers, string? sort_by = null, int[]? last_elements_id = null) where TLoad_sort_object : ISort_object
         {
             if (elements_sequence is IEnumerable<Article> || elements_sequence is IEnumerable<Article_comment>)
             {
                 elements_sequence = Sort_sequence_by.Sort_by(db_context, elements_sequence, sort_by);
-                if (last_element_id != -1 && last_article_id == -1)
+                if (last_elements_id is not null && last_elements_id.Length > 0 && elements_sequence.Count() - last_elements_id.Length > 0)
                 {
-                    elements_sequence = elements_sequence.SkipWhile(elem => elem.Id != last_element_id);
+                    elements_sequence = elements_sequence.SkipWhile(elem => !last_elements_id.Contains(elem.Id));
+                    if (elements_sequence.Count() > last_elements_id.Length)
+                    {
+                        elements_sequence = elements_sequence.SkipWhile(elem => last_elements_id.Contains(elem.Id));
+                    }
+                    if (!elements_sequence.Any())
+                    {
+                        return new();
+                    }
                 }
-                else if (last_element_id != -1 && last_article_id != -1 && elements_sequence is IEnumerable<Article_comment> comments_sequence)
-                {
-                    elements_sequence = comments_sequence.SkipWhile(elem => elem.Id != last_element_id || elem.Article_id != last_article_id) as IEnumerable<TLoad_sort_object> ?? elements_sequence;
-                }
-                elements_sequence = elements_sequence.Take(11);
+                if (elements_sequence.Count() > 10)
+                    headers.Add("need-load-more", "1");
+
+                elements_sequence = elements_sequence.Take(10);
                 await Load_sequence_data(db_context, elements_sequence);
             }
             return elements_sequence.ToList();

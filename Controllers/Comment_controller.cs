@@ -1,22 +1,24 @@
 ﻿using Dublongold_site.Filters;
+using Dublongold_site.Hubs;
 using Dublongold_site.Models;
 using Dublongold_site.Useful_classes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Dublongold_site.Controllers
 {
     [Route("comment")]
-    [Authenticated_user_filter]
-    [Authenticated_deleted_user_filter]
     public class Comment_control:Controller
     {
         private readonly Database_context db_context;
+        private readonly IHubContext<Actions_with_comments_hub> actions_with_comments_hub;
         private static object for_lock = new();
-        public Comment_control(Database_context new_db_context)
+        public Comment_control(Database_context new_db_context, IHubContext<Actions_with_comments_hub> new_actions_with_comments_hub)
         {
             db_context = new_db_context;
+            actions_with_comments_hub = new_actions_with_comments_hub;
         }
         [HttpGet]
         [Route("sort_by/{article_id:int}")]
@@ -29,12 +31,7 @@ namespace Dublongold_site.Controllers
 
                 if (article is not null)
                 {
-                    Console.WriteLine("Sort by: " + sort_by);
-                    List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), sort_by);
-
-                    if (comments.Count > 10)
-                        ViewData["last-comment-id"] = comments.Last().Id;
-                    return View("Comments_builder", comments.Take(10).ToList());
+                    return View("Comments_builder", await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment_id == null), Response.Headers, sort_by));
                 }
                 else
                 {
@@ -44,47 +41,54 @@ namespace Dublongold_site.Controllers
         }
         [HttpGet]
         [Route("load_more")]
-        public async Task<IActionResult> Load_more_comments(int comment_id, int article_id)
+        public async Task<IActionResult> Load_more_comments(string comment_ids_str, int article_id)
         {
             using (db_context)
             {
-                string? sort_by = Request.Headers["sort-by"];
-                if (comment_id > 0)
+                int[]? comment_ids = null;
+                int k = 0;
+                string[] comment_ids_array = comment_ids_str.Split(",");
+                if (comment_ids_array.Length > 0)
                 {
-                    Article_comment? last_comment = await db_context.Article_comments
-                        .Where(c => c.Id == comment_id && c.Article_id == article_id)
-                        .Include(c => c.Replying_comments)
-                        .Include(c => c.Reply_to_comment)
-                        .FirstOrDefaultAsync();
-                    if (last_comment is not null)
+                    comment_ids = new int[comment_ids_array.Length <= 10 ? comment_ids_array.Length : 10];
+                    foreach (string comment_id_str in comment_ids_array)
                     {
-                        if (last_comment.Reply_to_comment is Article_comment main_comment)
+                        if (!int.TryParse(comment_id_str, out comment_ids[k]))
                         {
-                            ViewData["Main_comment"] = main_comment;
-                            await db_context.Entry(main_comment).Collection(c => c.Replying_comments).LoadAsync();
-
-                            List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, main_comment.Replying_comments, sort_by, comment_id, article_id);
-                            if (comments.Count > 10)
-                                Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
-                            return View(comments.Take(10).ToList());
+                            comment_ids[k] = 0;
                         }
-                        else
-                        {
-                            Article? article = await db_context.Articles.Where(art => art.Id == article_id)
-                                        .Include(c => c.Comments).FirstOrDefaultAsync();
-                            if (article is not null)
-                            {
-                                List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments, sort_by, comment_id, article_id);
-                                if (comments.Count > 10)
-                                    Response.Headers.Add("last-comment-id", comments.Last().Id.ToString());
-                                return View(comments.Take(10).ToList());
-                            }
-                            else
-                                return NotFound();
-                        }
+                        k++;
+                    }
+                }
+                string? sort_by = Request.Headers["sort-by"];
+                if (comment_ids is not null)
+                {
+                    Article_comment? first_comment;
+                    if (comment_ids.Length > 0)
+                        first_comment = await db_context.Article_comments.Where(c => c.Article_id == article_id && c.Id == comment_ids[0]).Include(c => c.Reply_to_comment).FirstOrDefaultAsync();
+                    else
+                        first_comment = await db_context.Article_comments.FirstOrDefaultAsync();
+                    List<Article_comment> result;
+                    if (first_comment is not null && first_comment.Reply_to_comment is Article_comment main_comment)
+                    {
+                        ViewData["Main_comment"] = main_comment;
+                        await db_context.Entry(main_comment).Collection(c => c.Replying_comments).LoadAsync();
+                        Console.WriteLine(main_comment.Replying_comments.Count);
+                        result = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, main_comment.Replying_comments, Response.Headers, sort_by, comment_ids);
+                        Console.WriteLine(result.Count);
                     }
                     else
-                        return NotFound();
+                    {
+                        Article? article = await db_context.Articles.Where(art => art.Id == article_id)
+                                    .Include(c => c.Comments).FirstOrDefaultAsync();
+                        if (article is not null)
+                        {
+                            result = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, article.Comments.Where(c => c.Reply_to_comment is null), Response.Headers, sort_by, comment_ids);
+                        }
+                        else
+                            return NotFound();
+                    }
+                    return View(result);
                 }
                 else
                     return BadRequest();
@@ -92,14 +96,17 @@ namespace Dublongold_site.Controllers
         }
         [HttpPost]
         [Route("create/{article_id:int}")]
-        public IActionResult Create_comment(int article_id, string comment_content, int reply_level, int comment_id)
+        [Authenticated_user_filter]
+        public async Task<IActionResult> Create_comment(int article_id, string comment_content, int reply_level, int comment_id)
         {
+            bool write_non_reply_comment = false;
+            Article_comment comment;
             lock (for_lock)
             {
                 using (db_context)
                 {
                     int free_comment_id = Find_free_id_of_comments.Get_free_id(db_context.Article_comments.Where(c => c.Article_id == article_id).Select(c => c.Id).ToList());
-                    Article_comment comment = new()
+                    comment = new()
                     {
                         Id = free_comment_id,
                         Article_id = article_id,
@@ -109,13 +116,14 @@ namespace Dublongold_site.Controllers
                     };
                     if (reply_level > 0)
                     {
-                        int replies_count = db_context.Article_comments.Where(c => c.Id == comment_id && c.Article_id == article_id).Include(c => c.Replying_comments).FirstOrDefault()?.Replying_comments.Count() ?? 0;
+                        int replies_count = db_context.Article_comments.Where(c => c.Id == comment_id && c.Article_id == article_id).Include(c => c.Replying_comments).FirstOrDefault()?.Replying_comments.Count ?? 0;
                         HttpContext.Response.Headers.Add("replies-count", (replies_count + 1).ToString());
                         comment.Reply_to_comment_id = comment_id;
                         comment.Reply_to_comment_id_of_article = article_id;
                     }
                     else
                     {
+                        write_non_reply_comment = true;
                         HttpContext.Response.Headers.Add("comment-id", free_comment_id.ToString());
                     }
                     HttpContext.Response.Headers.Add("reply_level", reply_level.ToString());
@@ -125,13 +133,18 @@ namespace Dublongold_site.Controllers
                     HttpContext.Response.Headers.Add("reply-comment-id", free_comment_id.ToString());
                     db_context.Entry(comment).Reference(c => c.Author).Load();
                     db_context.Entry(comment).Reference(c => c.Reply_to_comment).Load();
-                    return View("/Views/Comment_control/Comment_builder.cshtml", comment);
                 }
             }
+            if (write_non_reply_comment)
+            {
+                await actions_with_comments_hub.Clients.Group("Read article " + article_id.ToString()).SendAsync("Comment writed");
+            }
+            return View("/Views/Comment_control/Comment_builder.cshtml", comment);
         }
         [HttpPut]
         [Route("edit/{comment_id:int}/{article_id:int}")]
-        public IActionResult Edit_comment(int comment_id, int article_id, string new_content)
+        [Authenticated_user_filter]
+        public async Task<IActionResult> Edit_comment(int comment_id, int article_id, string new_content)
         {
             lock (for_lock)
             {
@@ -145,7 +158,6 @@ namespace Dublongold_site.Controllers
                         comment.Who_edit = db_context.User_accounts.First(u => u.Login == User.Identity!.Name);
                         db_context.Article_comments.Update(comment);
                         db_context.SaveChanges();
-                        return Ok();
                     }
                     else
                     {
@@ -153,9 +165,12 @@ namespace Dublongold_site.Controllers
                     }
                 }
             }
+            await actions_with_comments_hub.Clients.Group("Read article " + article_id.ToString()).SendAsync("Comment edited", comment_id, new_content);
+            return Ok();
         }
         [HttpDelete]
         [Route("delete/{comment_id:int}/{article_id:int}")]
+        [Authenticated_user_filter]
         public IActionResult Delete_comment(int comment_id, int article_id)
         {
             lock (for_lock)
@@ -179,6 +194,7 @@ namespace Dublongold_site.Controllers
                                                     .Include(c => c.Replying_comments)
                                                         .FirstOrDefault()?.Replying_comments.Count.ToString() ?? "0");
                             }
+                            actions_with_comments_hub.Clients.Group("Read article " + article_id.ToString()).SendAsync("Comment deleted", comment_id);
                             return Ok(db_context.Article_comments.Where(c => c.Article_id == article_id).Count());
                         }
                         else
@@ -208,11 +224,7 @@ namespace Dublongold_site.Controllers
 
                     ViewData["Main_comment"] = comment;
                     HttpContext.Response.Headers.Add("replies-count", comment.Replying_comments.Count.ToString());
-
-                    List<Article_comment> comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, comment.Replying_comments, sort_by);
-                    if (comments.Count > 10)
-                        ViewData["last-comment-id"] = comments.Last().Id;
-                    return View(comments.Take(10).ToList());
+                    return View(await Helper_for_work_with_articles.Get_elements_with_load_and_sort(db_context, comment.Replying_comments, Response.Headers, sort_by));
                 }
                 else
                 {
@@ -222,6 +234,7 @@ namespace Dublongold_site.Controllers
         }
         [HttpPost]
         [Route("reaction/{comment_id:int}/{article_id:int}")]
+        [Authenticated_user_filter]
         public IActionResult Reaction_to_comment(int comment_id, int article_id, string reaction_type)
         {
             if (reaction_type != "like" && reaction_type != "dislike")

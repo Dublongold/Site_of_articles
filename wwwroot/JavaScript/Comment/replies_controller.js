@@ -20,7 +20,7 @@ async function replies_controller(this_element, comment_id)
                     this_element.setAttribute("replies_are_hidened", "false");
                     if(document.getElementsByClassName("write-reply-field").length === 1)
                     {
-                        document.getElementsByClassName("write-reply-field")[0].insertAdjacentHTML("afterend",await result.text());
+                        document.querySelector(".write-reply-field").insertAdjacentHTML("afterend",await result.text());
                     }
                     else
                     {
@@ -31,11 +31,7 @@ async function replies_controller(this_element, comment_id)
                         if(temp_reply_comments.hasAttribute("reply_to_comment") && temp_reply_comments.getAttribute("reply_to_comment") == comment_id)
                         {
                             add_event_listeners_for_comments_buttons(temp_reply_comments.getElementsByClassName("comment-container"));
-                            let load_more_comments_button = temp_reply_comments.querySelector(".load-more-comments");
-                            if(load_more_comments_button && load_more_comments_button.getAttribute("last_comment_id"))
-                            {
-                                load_more_comments_button.addEventListener("click", load_more_comments);
-                            }
+                            add_event_listener_for_load_more_comments(temp_reply_comments.querySelector(".load-more-comments"));
                             break;
                         }
                     }

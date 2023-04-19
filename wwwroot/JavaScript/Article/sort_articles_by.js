@@ -1,9 +1,6 @@
 "use strict";
 async function sort_article_by(event) {
-    const source = "Впорядковування статтей";
-    let error_message = "";
-    let where_append = null;
-    const error_message_id = "sort_articles_by";
+    let error_message_editor = new Error_message_editor("Впорядковування статтей", null, "sort_articles_by");
     if (event) {
         let this_element = event.currentTarget;
         if (this_element) {
@@ -19,18 +16,16 @@ async function sort_article_by(event) {
                         let block_actions_with_articles_element = document.createElement("div");
                         block_actions_with_articles_element.className = "block-click-when-load-articles";
                         page_body.appendChild(block_actions_with_articles_element);
-                        let name_or_text_of_article = null;
-                        if (window.location.search.indexOf("name_or_text_of_article") != -1) {
-                            let name_or_text_of_article_first_part = window.location.search.substring(window.location.search.indexOf("name_or_text_of_article"));
-                            name_or_text_of_article = name_or_text_of_article_first_part.substring(name_or_text_of_article_first_part.indexOf("=") + 1, name_or_text_of_article_first_part.indexOf("&") != -1 ? name_or_text_of_article_first_part.indexOf("&") : name_or_text_of_article_first_part.length - 1);
-                        }
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const name_or_text_of_article = urlParams.get("name_or_text_of_article");
                         let where_sort = encodeURIComponent(window.location.pathname.substring(1));
                         const sort_by_request = await fetch(`/article/sort_by/${where_sort}${name_or_text_of_article ? "/" + name_or_text_of_article : ""}`, { headers: { "is-sort-articles-action": "true", "sort-by": sort_by } });
                         if (sort_by_request.ok) {
                             preview_articles_container.remove();
                             body_head_text.insertAdjacentHTML("afterend", await sort_by_request.text());
-                            add_event_listeners_for_actions_with_article_buttons();
+                            add_interactive_with_new_articles();
                             add_event_listener_for_load_more_acticles();
+                            get_last_ten_or_less_articles_id();
                         }
                         else
                             console.log(sort_by_request.status);
@@ -41,7 +36,7 @@ async function sort_article_by(event) {
             }
         }
     }
-    error_message_editor(source, error_message, where_append, error_message_id);
+    error_message_editor.send();
 }
 document.addEventListener("DOMContentLoaded", function () {
     window.sessionStorage.setItem("sort-articles-by", "date");

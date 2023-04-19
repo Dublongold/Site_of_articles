@@ -38,7 +38,7 @@
         Все, що представляє коментар. Тобто, контент, автор, час створення, кнопки взаємодії тощо.
         comment_id призначений для вказування id цього коментаря для видалення, редагування, відповідей на нього тощо
     *@
-    <div class="comment-container" style="margin-left:@Model.Reply_level%; border-left: 1px solid @comment_color[color_number_for_comment]; 
+    <div class="comment-container new" style="margin-left:@Model.Reply_level%; border-left: 1px solid @comment_color[color_number_for_comment]; 
     border-right: 1px solid @comment_color[color_number_for_comment]; background-color: @background_comment_color[color_number_for_comment];"
     comment_id = "@Model.Id" @reply_to_id>
         <div>
@@ -74,6 +74,7 @@
                 @*Контент коментаря*@
                 <div class="comment-content-container">@Html.Raw(Model.Content)</div>
             </div>
+            <div class = "comment-edited-message">@(Model.Edited_date > Model.Created?"Відредагований":"")</div>
             @*Like, dislike, reply(s) div*@
             <div class="comment-reaction-container">
                 @*Кнопка Подобається*@

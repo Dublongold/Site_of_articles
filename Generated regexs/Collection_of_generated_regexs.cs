@@ -9,5 +9,7 @@ namespace Dublongold_site.Generated_regexs
         public static partial Regex Find_img();
         [GeneratedRegex("[^\\wа-яА-ЯіїІЇ]+", RegexOptions.IgnoreCase)]
         public static partial Regex Find_request_format();
+        [GeneratedRegex("\"(.+?)\"", RegexOptions.IgnoreCase)]
+        public static partial Regex Find_text_in_quotes();
     }
 }

@@ -54,10 +54,7 @@ async function save_edit_account_full_name_field(event: PointerEvent)
         let edit_user_name = document.getElementById("edit_user_name") as HTMLInputElement;
         let edit_user_surname = document.getElementById("edit_user_surname") as HTMLInputElement;
 
-        const source = "Редагування повного імені";
-        let error_message = "";
-        let where_append = user_full_name ?? this_element.parentElement;
-        const error_message_id = "edit_user_full_name";
+        let error_message_editor = new Error_message_editor("Редагування повного імені", user_full_name ?? this_element.parentElement, "edit_user_full_name");
 
         let user_login_element = document.querySelector("#user_login");
         let user_login = "";
@@ -88,25 +85,25 @@ async function save_edit_account_full_name_field(event: PointerEvent)
                     switch(request_to_edit.status)
                     {
                         case 404:
-                            error_message = "Вибачте, яле цього користувача немає в базі даних. Можливо, його видалили або просто неправильний логін був переданий в запиті."
+                            error_message_editor.error_message = "Вибачте, яле цього користувача немає в базі даних. Можливо, його видалили або просто неправильний логін був переданий в запиті."
                             break;
                         case 403:
-                            error_message = "У вас немає прав редагувати цього користувача!"
+                            error_message_editor.error_message = "У вас немає прав редагувати цього користувача!"
                             break;
                         case 401:
-                            error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати свій обліковий запис.";
+                            error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати свій обліковий запис.";
                             break;
                         default:
-                            error_message = `Виникла неочікувана помилка з кодом ${request_to_edit.status}.`;
+                            error_message_editor.error_message = `Виникла неочікувана помилка з кодом ${request_to_edit.status}.`;
                     }
                 }
             }
             else
-                error_message = "Неможна залишати поля імен пустими! Ви маєте ввести туди хоча б одну букву, цифру або символ нижнього підкреслювання.";
+            error_message_editor.error_message = "Неможна залишати поля імен пустими! Ви маєте ввести туди хоча б одну букву, цифру або символ нижнього підкреслювання.";
         }
         else
-            error_message = "Не знайдено якийсь із елементів, необхідних для виконання дії цієї кнопки";
-        error_message_editor(source, error_message, where_append, error_message_id);
+            error_message_editor.error_message = "Не знайдено якийсь із елементів, необхідних для виконання дії цієї кнопки";
+        error_message_editor.send();
         this_element.disabled = false;
     }
 }

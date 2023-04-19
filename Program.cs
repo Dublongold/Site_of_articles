@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Dublongold_site.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Dublongold_site.Useful_classes;
+using Dublongold_site.Hubs;
 
 namespace Dublongold_site
 {
@@ -33,6 +34,7 @@ namespace Dublongold_site
             builder.Services.AddControllersWithViews(options => options.ModelBinderProviders.Insert(0, new Register_user_binding_provider()));
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
+            builder.Services.AddSignalR();
             var app = builder.Build();
 
             app.UseStatusCodePagesWithReExecute("/error");
@@ -47,6 +49,8 @@ namespace Dublongold_site
                 }
             });
             app.MapControllers();
+
+            app.MapHub<Actions_with_comments_hub>("/actions_with_comments");
 
             app.Run();
         }

@@ -58,15 +58,12 @@ function remove_change_user_password_elements() {
 }
 async function check_entered_by_user_password(event) {
     let user_password_container = document.getElementById("user_password_container");
-    const source = "Зміна паролю";
-    let error_message = "";
-    let where_append = user_password_container;
-    const error_message_id = "change_user_password";
+    let error_message_editor = new Error_message_editor("Зміна паролю", user_password_container, "change_user_password");
     if (event) {
         let this_element = event.currentTarget;
         if (this_element) {
             if (user_password_container) {
-                where_append = user_password_container;
+                error_message_editor.where_append = user_password_container;
                 let enter_user_password_input = document.getElementById("enter_user_password_input");
                 if (enter_user_password_input) {
                     let password_for_check = enter_user_password_input.value;
@@ -116,48 +113,45 @@ async function check_entered_by_user_password(event) {
                         else {
                             switch (check_request.status) {
                                 case 403:
-                                    error_message = "Неправильний пароль.";
+                                    error_message_editor.error_message = "Неправильний пароль.";
                                     break;
                                 case 404:
-                                    error_message = `Не знайдено користувача з логіном "${login}}".`;
+                                    error_message_editor.error_message = `Не знайдено користувача з логіном "${login}}".`;
                                     break;
                                 case 400:
-                                    error_message = "Відправлений на сервер пароль або логін виявились пустими.";
+                                    error_message_editor.error_message = "Відправлений на сервер пароль або логін виявились пустими.";
                                     break;
                                 default:
-                                    error_message = 'Виникла неочікувана помилка з кодом ${check_request.status}.';
+                                    error_message_editor.error_message = 'Виникла неочікувана помилка з кодом ${check_request.status}.';
                             }
                         }
                     }
                     else if (login)
-                        error_message = "Пароль пустий.";
+                        error_message_editor.error_message = "Пароль пустий.";
                     else
-                        error_message = "Неможливо передати логін.";
+                        error_message_editor.error_message = "Неможливо передати логін.";
                 }
                 else
-                    error_message = "Не вдалося знайти поле, яке містило б пароль для перевірки.";
+                    error_message_editor.error_message = "Не вдалося знайти поле, яке містило б пароль для перевірки.";
             }
             else
-                error_message = "Чомусь, батьківський елемент цього елементу відсутній.";
+                error_message_editor.error_message = "Чомусь, батьківський елемент цього елементу відсутній.";
         }
         else
-            error_message = "Неможливо отримати елемент-кнопку, яка запустила цю подію.";
+            error_message_editor.error_message = "Неможливо отримати елемент-кнопку, яка запустила цю подію.";
     }
     else
-        error_message = "Помилка з подією в обробнику події.";
-    error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.error_message = "Помилка з подією в обробнику події.";
+    error_message_editor.send();
 }
 async function submit_change_user_password(event) {
     let user_password_container = document.getElementById("user_password_container");
-    const source = "Зміна паролю";
-    let error_message = "";
-    let where_append = user_password_container;
-    const error_message_id = "submit_change_user_password";
+    let error_message_editor = new Error_message_editor("Зміна паролю", user_password_container, "submit_change_user_password");
     if (event) {
         let this_element = event.currentTarget;
         if (this_element) {
             if (user_password_container) {
-                where_append = user_password_container;
+                error_message_editor.where_append = user_password_container;
                 let new_user_password = document.getElementById("new_user_password");
                 let new_user_password_confirm = document.getElementById("new_user_password_confirm");
                 if (new_user_password && new_user_password_confirm) {
@@ -179,39 +173,39 @@ async function submit_change_user_password(event) {
                                 else {
                                     switch (change_password_request.status) {
                                         case 404:
-                                            error_message = "Вибачте, яле цього користувача немає в базі даних. Можливо, його видалили або просто неправильний логін був переданий в запиті.";
+                                            error_message_editor.error_message = "Вибачте, яле цього користувача немає в базі даних. Можливо, його видалили або просто неправильний логін був переданий в запиті.";
                                             break;
                                         case 403:
-                                            error_message = "У вас немає прав редагувати цього користувача!";
+                                            error_message_editor.error_message = "У вас немає прав редагувати цього користувача!";
                                             break;
                                         case 401:
-                                            error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати свій обліковий запис.";
+                                            error_message_editor.error_message = "Ви неавторизовані. Будь-ласка, авторизуйтесь, щоб мати можливість реагувати свій обліковий запис.";
                                             break;
                                         default:
-                                            error_message = `Виникла неочікувана помилка з кодом ${change_password_request.status}.`;
+                                            error_message_editor.error_message = `Виникла неочікувана помилка з кодом ${change_password_request.status}.`;
                                     }
                                 }
                             }
                         }
                         else
-                            error_message = "Паролі не співпадають.";
+                            error_message_editor.error_message = "Паролі не співпадають.";
                     }
                     else
-                        error_message = "Пароль занадто простий.";
+                        error_message_editor.error_message = "Пароль занадто простий.";
                 }
                 else
-                    error_message = "Не вдалося знайти поля, у яких міститься пароль та підтвердження паролю.";
+                    error_message_editor.error_message = "Не вдалося знайти поля, у яких міститься пароль та підтвердження паролю.";
             }
             else
-                error_message = "Чомусь, батьківський елемент цього елементу відсутній.";
+                error_message_editor.error_message = "Чомусь, батьківський елемент цього елементу відсутній.";
         }
         else
-            error_message = "Неможливо отримати елемент-кнопку, яка запустила цю подію.";
+            error_message_editor.error_message = "Неможливо отримати елемент-кнопку, яка запустила цю подію.";
     }
     else
-        error_message = "Помилка з подією в обробнику події.";
-    if (error_message)
-        error_message_editor(source, error_message, where_append, error_message_id);
+        error_message_editor.error_message = "Помилка з подією в обробнику події.";
+    if (error_message_editor.error_message)
+        error_message_editor.send();
 }
 document.addEventListener("DOMContentLoaded", function () {
     let change_user_password_button = document.getElementById("change_user_password_button");

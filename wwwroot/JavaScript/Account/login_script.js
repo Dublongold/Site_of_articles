@@ -76,14 +76,12 @@ async function cancel_login() {
 }
 async function submit_login_data() {
     let form_for_login = document.getElementById("form_for_login_elements");
-    const source = "Вхід в обліковий запис";
-    let error_message = "";
-    let where_append = form_for_login;
-    const error_message_id = "login_path";
+    let error_message_editor = new Error_message_editor("Вхід в обліковий запис", form_for_login, "login_path");
+    error_message_editor.need_write_source = false;
     let login_texbox_element = document.getElementById("login_path_login");
     let password_texbox_element = document.getElementById("login_path_password");
     if (!login_texbox_element.value || password_texbox_element.value.trim().length === 0 || !password_texbox_element.value || password_texbox_element.value.trim().length === 0) {
-        error_message = "Ви повинні ввести логін та пароль!";
+        error_message_editor.error_message = "Ви повинні ввести логін та пароль!";
     }
     else {
         const login_request = await fetch(`/account/login/`, { method: "post", body: new FormData(form_for_login) });
@@ -94,18 +92,18 @@ async function submit_login_data() {
         }
         else {
             if (login_request_text === "invalid_login") {
-                error_message = `Не знайдено користувача з логіном "${login_texbox_element.value}".`;
+                error_message_editor.error_message = `Не знайдено користувача з логіном "${login_texbox_element.value}".`;
             }
             else if (login_request_text === "invalid_password") {
-                error_message = `Неправильний пароль.`;
+                error_message_editor.error_message = `Неправильний пароль.`;
             }
             else {
-                error_message = `Виникла неочікувана помилка з кодом ${login_request.status}...`;
+                error_message_editor.error_message = `Виникла неочікувана помилка з кодом ${login_request.status}...`;
             }
         }
     }
-    if (error_message)
-        error_message_editor(source, error_message, where_append, error_message_id);
+    if (error_message_editor.error_message)
+        error_message_editor.send();
 }
 function follow_to_article_create() {
     document.location.assign("/article/create");
