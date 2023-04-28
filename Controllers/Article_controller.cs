@@ -31,8 +31,7 @@ namespace Dublongold_site.Controllers
                 Article article = await db_context.Articles.Where(art => art.Id == id)
                                                 .Include(art => art.Authors)
                                                 .Include(art => art.Comments)
-                                                .Include(art => art.Users_who_liked)
-                                                .Include(art => art.Users_who_disliked)
+                                                .Include(art => art.Users_who_react)
                                                 .Include(art => art.Users_who_have_read)
                                                 .FirstAsync();
                 article.Comments = await Helper_for_work_with_articles.Get_elements_with_load_and_sort(
@@ -284,9 +283,9 @@ namespace Dublongold_site.Controllers
         [HttpPost]
         [Route("reaction/{article_id:int}")]
         [Authenticated_user_filter]
-        public IActionResult Reaction_to_article(int article_id, string reaction_type)
+        public IActionResult Reaction_to_article(int article_id, int reaction_type)
         {
-            if (reaction_type != "like" && reaction_type != "dislike")
+            if (reaction_type != 1 && reaction_type != 2)
             {
                 return BadRequest();
             }
@@ -296,7 +295,7 @@ namespace Dublongold_site.Controllers
                 {
                     Article? article = db_context.Articles
                         .Where(c => c.Id == article_id)
-                            .Include(c => c.Users_who_liked).Include(c => c.Users_who_disliked)
+                            .Include(c => c.Users_who_react)
                                 .FirstOrDefault();
                     if (article is not null)
                     {

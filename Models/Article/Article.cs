@@ -1,10 +1,13 @@
 ﻿using Dublongold_site.Useful_classes;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Dublongold_site.Models
 {
-    public class Article : IValidatableObject, ICan_like_and_dislike, ISort_object
+    public class Article : IValidatableObject, IReact_object<Article_reaction>, ISort_object
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Theme { get; set; } = null!;
         public string Description { get; set; } = null!;
@@ -12,8 +15,7 @@ namespace Dublongold_site.Models
         public string Tags { get; set; } = "";
         public string Title_image { get; set; } = "/Default_article_photo.png";
         public DateTime Created { get; init; } = DateTime.Now;
-        public List<User_account> Users_who_liked { get; set; } = new();
-        public List<User_account> Users_who_disliked { get; set; } = new();
+        public List<Article_reaction> Users_who_react { get; set; } = new();
         /// <summary>
         /// Список пользователей, которые прочитали данную статью.
         /// </summary>
@@ -34,5 +36,16 @@ namespace Dublongold_site.Models
             }
             return results;
         }
+        
+    }
+    public class Article_reaction : IReaction_container
+    {
+        public int Id { get; set; }
+        public int? Article_id { get; set; }
+        public Article? Article { get; set; }
+        public int? Who_react_id { get; set; }
+        public User_account? Who_react { get; set; }
+        // 0 = ніяка, таку краще видалити. 1 = сподобалось. 2 = не сподобалось.
+        public int Reaction_type { get; set; }
     }
 }

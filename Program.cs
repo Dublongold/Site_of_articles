@@ -3,6 +3,7 @@ using Dublongold_site.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Dublongold_site.Useful_classes;
 using Dublongold_site.Hubs;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Dublongold_site
 {
@@ -12,20 +13,19 @@ namespace Dublongold_site
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder();
-
             string connection_string = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
             Database_context.Connection_string = connection_string;
-
             // Призначенний для створення початкових елементів в бази даних.
             // Якщо потрібно, щоб дані зберігалися і не оновлювалися, то просто прибери його.
             Create_start_data_of_database.Create();
-            using (FileStream file = new(Directory.GetCurrentDirectory() + "/Db_log.txt", FileMode.Create))
-            {
 
-            }
+
+            using (FileStream file = new(Directory.GetCurrentDirectory() + "/Db_log.txt", FileMode.Create)) { }
+            
             builder.Services.AddDbContext<Database_context>(options =>
             {
-                options.UseMySql(connection_string, new MySqlServerVersion(new Version(8, 0, 32)));
+                options.UseSqlServer(connection_string);
+                // For MySQL: options.UseMySql(connection_string, new MySqlServerVersion(new Version(8, 0, 32)));
                 options.UseLoggerFactory(LoggerFactory.Create(
                     configure => configure.AddProvider(new FileLoggerProvider(Directory.GetCurrentDirectory() + "/Db_log.txt"))));
             });
@@ -35,10 +35,14 @@ namespace Dublongold_site
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession();
             builder.Services.AddSignalR();
+
             var app = builder.Build();
 
             app.UseStatusCodePagesWithReExecute("/error");
             app.UseSession();
+            RewriteOptions rewrite_options = new();
+            rewrite_options.AddRedirect("home", "/");
+            app.UseRewriter(rewrite_options);
             app.UseAuthentication();
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -53,7 +57,7 @@ namespace Dublongold_site
             app.MapHub<Actions_with_comments_hub>("/actions_with_comments");
 
             app.Run();
-        }
+            }
     }
     public class FileLogger : ILogger, IDisposable
     {

@@ -10,9 +10,23 @@ namespace Dublongold_site.Useful_classes
         {
             List<Object_for_sort> objs_for_sort;
             if (list_for_sort is IEnumerable<Article>)
-                objs_for_sort = db_context.Articles.Select(art => new Object_for_sort(art.Id, art.Id, art.Created, art.Users_who_liked.Count, art.Users_who_disliked.Count)).ToList();
+                objs_for_sort = db_context.Articles.Select(
+                    art => new Object_for_sort(
+                        art.Id,
+                        art.Id,
+                        art.Created,
+                        art.Users_who_react.Where(ur => ur.Reaction_type == 1).Count(),
+                        art.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()))
+                    .ToList();
             else if (list_for_sort is IEnumerable<Article_comment>)
-                objs_for_sort = db_context.Article_comments.Select(c => new Object_for_sort(c.Id, c.Article_id, c.Created, c.Users_who_liked.Count, c.Users_who_disliked.Count)).ToList();
+                objs_for_sort = db_context.Article_comments.Select(
+                    c => new Object_for_sort(
+                        c.Id,
+                        c.Article_id,
+                        c.Created,
+                        c.Users_who_react.Where(ur => ur.Reaction_type == 1).Count(),
+                        c.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()))
+                    .ToList();
             else
                 return list_for_sort;
             objs_for_sort = sort_by switch
@@ -31,11 +45,6 @@ namespace Dublongold_site.Useful_classes
 
             return sorted_list;
         }
-    }
-    public interface ISort_object : ICan_like_and_dislike
-    {
-        public int Id { get; set; }
-        public DateTime Created { get; init; }
     }
     public struct Object_for_sort
     {

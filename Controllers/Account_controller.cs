@@ -163,14 +163,14 @@ namespace Dublongold_site.Controllers
                 if (user_account is not null)
                 {
                     user_account = await db_context.User_accounts.Where(u => u.Id == user_account.Id)
-                        .Include(u => u.Articles).Include(u => u.Users_who_liked)
-                        .Include(u => u.Users_who_disliked).FirstAsync();
+                        .Include(u => u.Articles).Include(u => u.Users_who_react)
+                        .FirstAsync();
                     for (int i = 0; i < user_account.Articles.Count; i++)
                     {
 
                         user_account.Articles[i] = await db_context.Articles.Where(art => art.Id == user_account.Articles[i].Id)
-                            .Include(art => art.Authors).Include(u => u.Users_who_liked)
-                            .Include(art => art.Users_who_disliked).Include(art => art.Users_who_have_read)
+                            .Include(art => art.Authors).Include(u => u.Users_who_react)
+                            .Include(art => art.Users_who_have_read)
                             .Include(art => art.Comments).FirstAsync();
                     }
                     return View("User_profile", model: user_account);
@@ -284,11 +284,11 @@ namespace Dublongold_site.Controllers
         [HttpPost]
         [Route("reaction/{user_login}")]
         [Authenticated_user_filter]
-        public IActionResult Reaction_to_user_account(string user_login, string reaction_type)
+        public IActionResult Reaction_to_user_account(string user_login, int reaction_type)
         {
             if (User.Identity!.Name == user_login)
                 return StatusCode(403);
-            if (reaction_type != "like" && reaction_type != "dislike")
+            if (reaction_type != 1 && reaction_type != 2)
                 return BadRequest();
             lock (for_lock)
             {
@@ -296,7 +296,7 @@ namespace Dublongold_site.Controllers
                 {
                     User_account? user_account = db_context.User_accounts
                         .Where(c => c.Login == user_login)
-                            .Include(c => c.Users_who_liked).Include(c => c.Users_who_disliked)
+                            .Include(c => c.Users_who_react)
                                 .FirstOrDefault();
                     if (user_account is not null)
                     {
