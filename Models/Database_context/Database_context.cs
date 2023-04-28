@@ -12,7 +12,8 @@ namespace Dublongold_site.Models
         public DbSet<Article> Articles { get; set; } = null!;
         public DbSet<Article_comment> Article_comments { get; set; } = null!;
         public static string? Connection_string { get; set; }
-        public Database_context() : this((new DbContextOptionsBuilder<Database_context>()).UseMySql(Connection_string, new MySqlServerVersion(new Version(8,0,32))).Options)
+        public Database_context() : this((new DbContextOptionsBuilder<Database_context>()).UseSqlServer(Connection_string).Options)
+        // public Database_context() : this((new DbContextOptionsBuilder<Database_context>()).UseMySql(Connection_string, new MySqlServerVersion(new Version(8,0,32))).Options)
         {
 
         }
@@ -22,13 +23,36 @@ namespace Dublongold_site.Models
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Article_reaction>()
+                .HasOne(ar => ar.Article)
+                    .WithMany(art => art.Users_who_react)
+                        .HasForeignKey(ar => ar.Article_id);
+            builder.Entity<Article_reaction>()
+                .HasOne(ar => ar.Who_react)
+                    .WithMany()
+                        .HasForeignKey(ar => ar.Who_react_id);
+
+            builder.Entity<Article_comment_reaction>()
+                .HasOne(cr => cr.Comment)
+                    .WithMany()
+                        .HasForeignKey(cr => new { cr.Article_comment_id, cr.Article_id })
+                            .OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Article_comment_reaction>()
+                .HasOne(cr => cr.Who_react)
+                    .WithMany()
+                        .HasForeignKey(cr => cr.Who_react_id)
+                            .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<User_account_reaction>()
+                .HasOne(ur => ur.User_account)
+                    .WithMany()
+                        .HasForeignKey(ur => ur.User_account_id);
+            builder.Entity<User_account_reaction>()
+                .HasOne(ur => ur.Who_react)
+                    .WithMany()
+                        .HasForeignKey(ur => ur.Who_react_id)
+                            .OnDelete(DeleteBehavior.SetNull);
             builder.Entity<Article>().ToTable("Articles");
-            builder.Entity<Article>()
-                .HasMany(art => art.Users_who_liked)
-                    .WithMany(u => u.Articles_which_liked);
-            builder.Entity<Article>()
-                .HasMany(art => art.Users_who_disliked)
-                    .WithMany(u => u.Articles_which_disliked);
             builder.Entity<Article>()
                 .HasMany(art => art.Users_who_have_read)
                     .WithMany(u => u.Articles_which_been_read);
@@ -47,16 +71,15 @@ namespace Dublongold_site.Models
                 .HasOne(c => c.Reply_to_comment)
                     .WithMany(c => c.Replying_comments)
                         .HasForeignKey(c => new { c.Reply_to_comment_id, c.Reply_to_comment_id_of_article });
+
             builder.Entity<Article_comment>()
-                .HasMany(c => c.Users_who_liked)
-                    .WithMany();
-            builder.Entity<Article_comment>()
-                .HasMany(c => c.Users_who_disliked)
+                .HasMany(c => c.Users_who_react)
                     .WithMany();
             builder.Entity<Article_comment>()
                 .HasOne(c => c.Who_edit)
                     .WithMany()
                         .HasForeignKey(c => c.Who_edit_id);
+
             builder.Entity<User_account>().ToTable("Accounts");
             builder.Entity<User_account>()
                 .HasMany(x => x.Articles)
@@ -68,8 +91,6 @@ namespace Dublongold_site.Models
             builder.Entity<User_account>()
                 .HasIndex(x => x.Login)
                     .IsUnique();
-            builder.Entity<User_account>()
-                .OwnsOne(x => x.Status);
         }
     }
 }

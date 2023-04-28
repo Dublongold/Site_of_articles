@@ -1,8 +1,7 @@
-﻿using Dublongold_site.Useful_classes;
-
+﻿
 namespace Dublongold_site.Models
 {
-    public class Article_comment : ICan_like_and_dislike, ISort_object
+    public class Article_comment : IReact_object<Article_comment_reaction>, ISort_object
     {
         public int Id { get; set; }
         public int Article_id { get; set; }
@@ -19,7 +18,17 @@ namespace Dublongold_site.Models
         public int? Reply_to_comment_id { get; set; }
         public int? Reply_to_comment_id_of_article { get; set; }
         public Article_comment? Reply_to_comment { get; set; }
-        public List<User_account> Users_who_liked { get; set; } = new();
-        public List<User_account> Users_who_disliked { get; set; } = new();
+        public List<Article_comment_reaction> Users_who_react { get; set; } = new();
+    }
+    public class Article_comment_reaction : IReaction_container
+    {
+        public int Id { get; set; }
+        public int? Article_id { get; set; }
+        public int? Article_comment_id { get; set; }
+        public Article_comment? Comment { get; set; }
+        public int? Who_react_id { get; set; }
+        public User_account? Who_react { get; set; }
+        // 0 = ніяка, таку краще видалити. 1 = сподобалось. 2 = не сподобалось.
+        public int Reaction_type { get; set; }
     }
 }

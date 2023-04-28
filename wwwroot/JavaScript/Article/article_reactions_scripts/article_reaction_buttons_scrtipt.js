@@ -2,6 +2,7 @@
 async function article_reaction(this_element, other_element, is_like) {
     if (this_element) {
         this_element.disabled = true;
+        let reaction_type = is_like ? 1 : 2;
         let reaction_text_of_this = is_like ? "like" : "dislike";
         let reaction_text_of_other = !is_like ? "like" : "dislike";
         let this_count = document.getElementById(`${reaction_text_of_this}_count_of_article`);
@@ -9,7 +10,7 @@ async function article_reaction(this_element, other_element, is_like) {
         let where_append = this_element.parentElement && this_element.parentElement.parentElement ? this_element.parentElement : null;
         let error_message_editor = new Error_message_editor(`Кнопка "${is_like ? "П" : "Не п"}одобається"`, where_append, "article_reaction");
         if (this_element && other_element && this_count && other_count) {
-            var result = await fetch(`/article/reaction/${article_id}/?reaction_type=${reaction_text_of_this}`, { method: "post" });
+            var result = await fetch(`/article/reaction/${article_id}/?reaction_type=${reaction_type}`, { method: "post" });
             if (result.ok) {
                 var result_text = await result.text();
                 if (result_text == "a" || result_text == "r" || result_text == "c") {

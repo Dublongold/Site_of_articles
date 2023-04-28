@@ -235,9 +235,9 @@ namespace Dublongold_site.Controllers
         [HttpPost]
         [Route("reaction/{comment_id:int}/{article_id:int}")]
         [Authenticated_user_filter]
-        public IActionResult Reaction_to_comment(int comment_id, int article_id, string reaction_type)
+        public IActionResult Reaction_to_comment(int comment_id, int article_id, int reaction_type)
         {
-            if (reaction_type != "like" && reaction_type != "dislike")
+            if (reaction_type != 1 && reaction_type != 2)
             {
                 return BadRequest();
             }
@@ -247,7 +247,7 @@ namespace Dublongold_site.Controllers
                 {
                     Article_comment? comment = db_context.Article_comments
                         .Where(c => c.Id == comment_id && c.Article_id == article_id)
-                            .Include(c => c.Users_who_liked).Include(c => c.Users_who_disliked)
+                            .Include(c => c.Users_who_react)
                                 .FirstOrDefault();
                     if (comment is not null)
                     {

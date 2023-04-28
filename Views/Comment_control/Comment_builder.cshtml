@@ -7,8 +7,8 @@
     string[] comment_color = { "red", "green", "blue" };
     Article_comment? Main_comment = ViewData["Main_comment"] as Article_comment;
     User_account? user_account = null;
-    int count_of_liked = Model.Users_who_liked.Count;
-    int count_of_disliked = Model.Users_who_disliked.Count;
+    int count_of_liked = Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Count();
+    int count_of_disliked = Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Count();
     int color_number_for_comment = count_of_liked < count_of_disliked ? 0 : count_of_disliked != count_of_liked ? 1 : 2;
     string? reply_to_id = null;
     Article? article = null;
@@ -79,17 +79,17 @@
             <div class="comment-reaction-container">
                 @*Кнопка Подобається*@
                 <button type = "button" class = "like-button-of-comment"
-                style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">
+                style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?1:2]">
                     Подобається
                 </button> : 
-                <span class="number-of-comment-likes">@Model.Users_who_liked.Count</span>
+                <span class="number-of-comment-likes">@Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Count()</span>
                 <span> | </span>
                 @*Кнопка Не подобається*@
                 <button type = "button" class = "dislike-button-of-comment"
-                style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">
+                style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?0:2]">
                     Не подобається
                 </button> : 
-                <span class="number-of-comment-dislikes">@Model.Users_who_disliked.Count</span>
+                <span class="number-of-comment-dislikes">@Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Count()</span>
                 @*Якщо є відповіді, то створити класс, який буде зберігати відповіді на цей коментар*@
                 @if (Model.Replying_comments.Count > 0)
                 {
