@@ -84,7 +84,8 @@ namespace Dublongold_site.Useful_classes
             {
                 var temp_article = await db_context.Articles.Where(art => art.Id == element.Id)
                     .Include(art => art.Authors)
-                    .Include(art => art.Users_who_react)
+                    .Include(art => art.Users_who_liked)
+                    .Include(art => art.Users_who_disliked)
                     .Include(art => art.Users_who_have_read)
                     .Include(art => art.Comments).FirstOrDefaultAsync();
             }
@@ -93,7 +94,8 @@ namespace Dublongold_site.Useful_classes
                 var temp_comment = await db_context.Article_comments
                     .Where(c => c.Id == comment.Id && c.Article_id == comment.Article_id)
                     .Include(c => c.Author)
-                    .Include(c => c.Users_who_react)
+                    .Include(c => c.Users_who_liked)
+                    .Include(c => c.Users_who_disliked)
                     .Include(c => c.Replying_comments).FirstOrDefaultAsync();
             }
         }

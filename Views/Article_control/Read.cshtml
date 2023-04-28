@@ -34,12 +34,12 @@
             <div class="like-dislike-author-container">
                 <div>
                     <button type = "button" id = "like_article" 
-                        style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?1:2]">Подобається</button>
-                    : <span id = "like_count_of_article" >@Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Count()</span>
+                        style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">Подобається</button>
+                    : <span id = "like_count_of_article" >@Model.Users_who_liked.Count</span>
                     <span> | </span>
                     <button type = "button" id = "dislike_article"
-                        style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?0:2]">Не подобається</button>
-                    : <span id = "dislike_count_of_article">@Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()</span>
+                        style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">Не подобається</button>
+                    : <span id = "dislike_count_of_article">@Model.Users_who_disliked.Count()</span>
                 </div>
                 <div class="author-element">
                     @if(Model.Authors.Count > 1)

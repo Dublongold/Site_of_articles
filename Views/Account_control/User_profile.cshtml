@@ -61,11 +61,11 @@
                 else
                 {
                 <button type = "button" id = "account_like_button"
-                style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?1:2]">
+                style="background-color:@background_reaction_color[Model.Users_who_liked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?1:2]">
                     Подобається
                 </button><text> : </text>
                 }
-                <span id="number_of_account_likes">@Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()</span>
+                <span id="number_of_account_likes">@Model.Users_who_liked.Count</span>
                 <span> | </span>
                 @* Кнопка "Не подобається" або, якщо користувач, який переглядає цю сторінку, і є цим користувачем, то простий текст "Не подобається" *@
                 @if((User.Identity is null || User.Identity.Name is null) || User.Identity is not null && User.Identity.Name == Model.Login)
@@ -75,11 +75,11 @@
                 else
                 {
                 <button type = "button" id = "account_dislike_button"
-                style="background-color:@background_reaction_color[Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Any(u => User.Identity is not null && User.Identity.Name == u.Who_react?.Login)?0:2]">
+                style="background-color:@background_reaction_color[Model.Users_who_disliked.Any(u => User.Identity is not null && User.Identity.Name == u.Login)?0:2]">
                     Не подобається
                 </button><text> : </text>
                 }
-                <span id="number_of_account_dislikes">@Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()</span>
+                <span id="number_of_account_dislikes">@Model.Users_who_disliked.Count</span>
             </div>
         </div>
         @* Зберігає поле, де користувач може змінити своє фото *@
@@ -102,12 +102,12 @@
         @if(Model.Articles.Count > 5)
         {
             <legend class = "title-of-user-articles">5 найбільш популярних статтей, написаних цим користувачем:</legend>
-            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_react.Where(ur => ur.Reaction_type == 1).Count() - art.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()).ThenBy(art => art.Theme).ThenBy(art => art.Description).Take(5).ToList())
+            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_liked.Count - art.Users_who_disliked.Count).ThenBy(art => art.Theme).ThenBy(art => art.Description).Take(5).ToList())
         }
         else if (Model.Articles.Count > 0)
         {
             <legend class = "title-of-user-articles">Статті, написані цим користувачем:</legend>
-            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_react.Where(ur => ur.Reaction_type == 1).Count() - art.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()).ThenBy(art => art.Theme).ThenBy(art => art.Description).ToList())
+            @await Html.PartialAsync("Render_articles", Model.Articles.OrderBy(art => art.Users_who_liked.Count - art.Users_who_disliked.Count).ThenBy(art => art.Theme).ThenBy(art => art.Description).ToList())
         }
         </fieldset>
     }

@@ -4,7 +4,6 @@ async function article_reaction(this_element: HTMLButtonElement, other_element:H
     {
         this_element.disabled = true;
 
-        let reaction_type = is_like?1:2;
         let reaction_text_of_this = is_like?"like":"dislike";
         let reaction_text_of_other = !is_like?"like":"dislike";
 
@@ -15,7 +14,7 @@ async function article_reaction(this_element: HTMLButtonElement, other_element:H
         let error_message_editor = new Error_message_editor(`Кнопка "${is_like?"П":"Не п"}одобається"`, where_append, "article_reaction");
         if(this_element && other_element && this_count && other_count)
         {
-            var result = await fetch(`/article/reaction/${article_id}/?reaction_type=${reaction_type}`,{method:"post"});
+            var result = await fetch(`/article/reaction/${article_id}/?reaction_type=${reaction_text_of_this}`,{method:"post"});
 
             if(result.ok)
             {

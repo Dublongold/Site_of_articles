@@ -2,7 +2,6 @@
 async function comment_reaction(this_element, other_element, comment_id, is_like) {
     if (this_element) {
         this_element.disabled = true;
-        let reaction_type = is_like ? 1 : 2;
         let reaction_text_of_this = is_like ? "like" : "dislike";
         let reaction_text_of_other = !is_like ? "like" : "dislike";
         let where_append = this_element.parentElement && this_element.parentElement.parentElement ? this_element.parentElement.parentElement : null;
@@ -12,7 +11,7 @@ async function comment_reaction(this_element, other_element, comment_id, is_like
             let this_count = comment_element.querySelector(`.number-of-comment-${reaction_text_of_this}s`);
             let other_count = comment_element.querySelector(`.number-of-comment-${reaction_text_of_other}s`);
             if (this_element && other_element && this_count && other_count) {
-                const result = await fetch(`/comment/reaction/${comment_id}/${article_id}/?reaction_type=${reaction_type}`, { method: "post" });
+                const result = await fetch(`/comment/reaction/${comment_id}/${article_id}/?reaction_type=${reaction_text_of_this}`, { method: "post" });
                 if (result.ok) {
                     var result_text = await result.text();
                     if (result_text == "a" || result_text == "r" || result_text == "c") {

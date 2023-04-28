@@ -13,13 +13,12 @@ async function account_reaction(this_element, other_element, is_like) {
             }
         }
         if (user_login && user_login.length > 5) {
-            let reaction_type = is_like ? 1 : 2;
             let reaction_text_of_this = is_like ? "like" : "dislike";
             let reaction_text_of_other = !is_like ? "like" : "dislike";
             let this_count = document.getElementById(`number_of_account_${reaction_text_of_this}s`);
             let other_count = document.getElementById(`number_of_account_${reaction_text_of_other}s`);
             if (this_element && other_element && this_count && other_count) {
-                var result = await fetch(`/account/reaction/${user_login.substring(1)}/?reaction_type=${reaction_type}`, { method: "post" });
+                var result = await fetch(`/account/reaction/${user_login.substring(1)}/?reaction_type=${reaction_text_of_this}`, { method: "post" });
                 if (result.ok) {
                     var result_text = await result.text();
                     if (result_text == "a" || result_text == "r" || result_text == "c") {

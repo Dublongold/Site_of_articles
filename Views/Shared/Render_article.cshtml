@@ -22,7 +22,7 @@
                 <br/>
                 Коментарів: @Model.Comments.Count
                 <br/>
-                Сподобалось: @Model.Users_who_react.Where(ur => ur.Reaction_type == 1).Count(), Не сподобалось: @Model.Users_who_react.Where(ur => ur.Reaction_type == 2).Count()
+                Сподобалось: @Model.Users_who_liked.Count, Не сподобалось: @Model.Users_who_disliked.Count()
                 <span style="float: right;">
                     Автор@(Model.Authors.Count > 1 ? "и" : ""): @Html.Raw(Model.Authors.Count > 0 ? Model.Authors.Select(x => "<a href = \"/account/profile/" + x.Login + "\">@" + x.Login + "</a>").Aggregate((u1, u2) => u1 + ", " + u2) : "Ніхто?")
                 </span>

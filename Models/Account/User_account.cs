@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Dublongold_site.Useful_classes;
 
 namespace Dublongold_site.Models
 {
-    public class User_account : IReact_object<User_account_reaction>
+    public class User_account : ICan_like_and_dislike
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required(ErrorMessage = "Введіть логін.")]
         public string Login { get; set; } = "";
@@ -27,6 +26,7 @@ namespace Dublongold_site.Models
                 return Photo is not null ? Photo : "/Default_user_photo.png";
             }
         }
+        public User_role Role { get; set; } = User_role.User;
         public User_rank Rank 
         {
             get
@@ -58,12 +58,14 @@ namespace Dublongold_site.Models
             }
         }
         public DateTime Created { get; init; } = DateTime.Now;
+        public User_status? Status { get; set; } = new User_status();
         public List<Article> Articles { get; set; } = new();
+        public List<Article> Articles_which_liked { get; set; } = new();
+        public List<Article> Articles_which_disliked { get; set; } = new();
         public List<Article> Articles_which_been_read { get; set; } = new();
-        public List<User_account_reaction> Users_who_react { get; set; } = new();
+        public List<User_account> Users_who_liked { get; set; } = new();
+        public List<User_account> Users_who_disliked { get; set; } = new();
         public List<Article_comment> Comments { get; set; } = new();
-        // public List<Article_comment> Comments_which_liked { get; set; } = new();
-        // public List<Article_comment> Comments_which_disliked { get; set; } = new();
         /// <summary>
         /// Викликає перевантажений метод, який приймає в параметрі ранг користувача.
         /// </summary>
@@ -90,24 +92,21 @@ namespace Dublongold_site.Models
                 _ => "Невідомий"
             };
         }
-    }
-    public enum User_rank
-    {
-        Newbie, // Новичёк
-        Novice_reader, // Читатель-новичёк
-        Reader, // Читатель
-        Active_reader, // Активный читатель
-        Expert, // Эксперт
-        Enlightened // Просвещённый
-    }
-    public class User_account_reaction : IReaction_container
-    {
-        public int Id { get; set; }
-        public int? User_account_id { get; set; }
-        public User_account? User_account { get; set; }
-        public int? Who_react_id { get; set; }
-        public User_account? Who_react { get; set; }
-        // 0 = ніяка, таку краще видалити. 1 = сподобалось. 2 = не сподобалось.
-        public int Reaction_type { get; set; }
+        public enum User_role
+        {
+            User,
+            Administrator,
+            Moderator,
+            Developer
+        }
+        public enum User_rank
+        {
+            Newbie, // Новичёк
+            Novice_reader, // Читатель-новичёк
+            Reader, // Читатель
+            Active_reader, // Активный читатель
+            Expert, // Эксперт
+            Enlightened // Просвещённый
+        }
     }
 }
